@@ -1,4 +1,4 @@
-package com.example.redaeri.user;
+package com.bside.redaeri.user;
 
 import org.apache.ibatis.annotations.Mapper;
 

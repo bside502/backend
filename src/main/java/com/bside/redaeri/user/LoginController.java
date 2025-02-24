@@ -1,4 +1,4 @@
-package com.example.redaeri.user;
+package com.bside.redaeri.user;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.redaeri.util.JwtUtil;
+import com.bside.redaeri.util.JwtUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @RestController
@@ -26,15 +26,8 @@ public class LoginController {
 	private static String NAVER_TOKEN_URL = "https://nid.naver.com/oauth2.0/token";
 	private static String NAVER_USER_INFO_URL = "https://openapi.naver.com/v1/nid/me";
 	
-	@Autowired
-	private LoginService loginService;
-
 	@PostMapping("/naver/callback")
 	public void naverCallback(@RequestBody Map<String, Object> param) throws IOException {
-		/*
-		 */
-		// 1. 네이버에 access_token 요청
-
 		try {
 			String code = (String) param.get("code");
 			String state = (String) param.get("state");
@@ -46,7 +39,8 @@ public class LoginController {
 			String accessToken = getAccessToken(code, state);
 
 			Map<String, Object> userInfo = getUserProfile(accessToken);
-
+			// todo 이미 등록된 회원인지 확인
+			
 			String jwtToken = JwtUtil.generateToken(userInfo.get("id").toString());
 
 		} catch (Exception e) {
@@ -55,8 +49,12 @@ public class LoginController {
 	}
 
 	private String getAccessToken(String code, String state) throws IOException {
-		String requestURL = NAVER_TOKEN_URL + "?grant_type=authorization_code" + "&client_id=" + NAVER_CLIENT_ID
-				+ "&client_secret=" + NAVER_CLIENT_SECRET + "&code=" + code + "&state=" + state;
+		String requestURL = NAVER_TOKEN_URL 
+				+ "?grant_type=authorization_code"
+				+ "&client_id=" + NAVER_CLIENT_ID
+				+ "&client_secret=" + NAVER_CLIENT_SECRET 
+				+ "&code=" + code 
+				+ "&state=" + state;
 
 		try {
 
@@ -78,10 +76,10 @@ public class LoginController {
 			while ((inputLine = br.readLine()) != null) {
 				response.append(inputLine);
 			}
-
 			br.close();
 			System.out.println("accessToken ==> " + response.toString());
 			String accessToken = response.toString().split("\"access_token\":\"")[1].split("\"")[0];
+			
 			return accessToken;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -89,24 +87,29 @@ public class LoginController {
 		return null;
 	}
 
-	
-	 private Map<String, Object> getUserProfile(String accessToken) throws IOException {
-		 URL url = new URL(NAVER_USER_INFO_URL);
-		 HttpURLConnection con = (HttpURLConnection) url.openConnection();
-	     con.setRequestMethod("GET");
-	     con.setRequestProperty("Authorization", "Bearer " + accessToken);
-
-	     BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
-	     String inputLine;
-	     StringBuilder response = new StringBuilder();
-	     while ((inputLine = br.readLine()) != null) {
-	        response.append(inputLine);
-	     }
-	     br.close();
-
-	     ObjectMapper objectMapper = new ObjectMapper();
-	     Map<String, Object> jsonMap = objectMapper.readValue(response.toString(), Map.class);
-	     
-	     return (Map<String, Object>) jsonMap.get("response");	 
-	 }
+	private Map<String, Object> getUserProfile(String accessToken) {
+		try {
+			URL url = new URL(NAVER_USER_INFO_URL);
+			HttpURLConnection con = (HttpURLConnection) url.openConnection();
+			con.setRequestMethod("GET");
+			con.setRequestProperty("Authorization", "Bearer " + accessToken);
+		
+			BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
+			String inputLine;
+			StringBuilder response = new StringBuilder();
+			
+			while ((inputLine = br.readLine()) != null) {
+				response.append(inputLine);
+			}
+			br.close();
+		
+			ObjectMapper objectMapper = new ObjectMapper();
+			Map<String, Object> jsonMap = objectMapper.readValue(response.toString(), Map.class);
+		     
+			return (Map<String, Object>) jsonMap.get("response");	 
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
 }

@@ -1,4 +1,4 @@
-package com.example.redaeri.util;
+package com.bside.redaeri.util;
 
 import java.security.Key;
 import java.util.Date;

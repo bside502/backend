@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bside.redaeri.user.userMapper">
+	<select id="getUserId" parameterType="HashMap" resultType="HashMap">
+		SELECT
+			user_id
+		FROM
+			user;
+		WHERE
+			user_id = #{user_id}
+	</select>
+	
+	<select id="getUserInfo" parameterType="HashMap" resultType="HashMap">
+		SELECT
+			idx as user_idx
+			, user_id
+		FROM
+			user
+		WHERE
+			idx = #{login_idx}
+	</select>
+</mapper>
