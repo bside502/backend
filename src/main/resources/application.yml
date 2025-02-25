@@ -1,0 +1,51 @@
+spring:
+  application:
+    name: redaeri
+  profiles:
+    active: local
+  devtools:
+    livereload:
+      enabled: true
+    restart:
+      enabled: true
+
+
+server:
+  port: 8080
+
+mybatis:
+  mapper-locations: mappers/*.xml
+  configuration:
+    call-setters-on-nulls: true
+
+
+jwt:
+  secret:
+    key: qltkdlemdnflxlaWkddlekdngkgkdjfakskzlfmfejsmffudigkfRk1
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile:
+      - local
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/redaeri?serverTimezone=UTC&characterEncoding=UTF-8
+    username: ENC(ttOlbqf+jEsgiKszV/DrLFz7EqAGyGmRty5zBKQYPb42XRxX3BIkA7hMbIZi4XqZ)
+    password: ENC(5O7so2/IIbHAxjsaYcV6H5fls9fy5xQ7Fj8U1ZuiLpojFM3nnDZ92J3+96OCWkfC)
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile:
+      - dev
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ENC(oA/nTK5Pn6v4SeNmCAGONe2hwcOH7MhQN8FiMVTwWxD0blBqOUzFL2sCHYN0m9ENIN/uvgTKzEvCoLidy9P0lCwmj8agRzRSrzP+UnRous+WwA0Rt7b8nLSLVS/B+/Z4yq4bKfSNgvMEePzIJMMbTQHdGiuxSLogURqZwk++Heg=)
+    username: ENC(P6UNoqXzWUpPbNsHg28y26gzmBAse+Vh7GFN4tIfenWuAKsKM6+pSlz+YMMLkK2i)
+    password: ENC(cdJ8XgTHfAqDhTDhZTW9Ayk55guy85G2lbczlxNHKlAPyw6L0DBjmhXjRArtFz3P)
+
