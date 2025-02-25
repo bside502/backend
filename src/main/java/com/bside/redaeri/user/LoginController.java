@@ -13,13 +13,16 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.bside.redaeri.util.JwtUtil;
+import com.bside.redaeri.filter.JWTService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @RestController
 @RequestMapping("/api/v1/")
 public class LoginController {
-
+	
+	@Autowired
+	private JWTService jwtService;
+	
 	private static String NAVER_CLIENT_ID = "";
 	private static String NAVER_CLIENT_SECRET = "";
 
@@ -41,7 +44,7 @@ public class LoginController {
 			Map<String, Object> userInfo = getUserProfile(accessToken);
 			// todo 이미 등록된 회원인지 확인
 			
-			String jwtToken = JwtUtil.generateToken(userInfo.get("id").toString());
+			String jwtToken = jwtService.generateToken(userInfo);
 
 		} catch (Exception e) {
 			e.printStackTrace();

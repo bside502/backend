@@ -29,16 +29,22 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-jdbc'
 	
 	// jwt
-	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'io.jsonwebtoken:jjwt-api:0.12.6'
 	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.6'
 	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.6'
+	
+	// 
+	implementation 'org.springframework.boot:spring-boot-devtools'
 	
 	// mybatis
 	implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.4'
 	
 	// jasypt
     implementation 'com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.5'
+    
+    //lombok
+    compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
 }
 
 tasks.named('test') {

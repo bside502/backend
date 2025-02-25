@@ -2,8 +2,14 @@ spring:
   application:
     name: redaeri
   profiles:
-    active:
-    - local
+    active: local
+  devtools:
+    livereload:
+      enabled: true
+    restart:
+      enabled: true
+
+
 server:
   port: 8080
 
@@ -11,6 +17,11 @@ mybatis:
   mapper-locations: mappers/*.xml
   configuration:
     call-setters-on-nulls: true
+
+
+jwt:
+  secret:
+    key: qltkdlemdnflxlaWkddlekdngkgkdjfakskzlfmfejsmffudigkfRk1
 
 ---
 

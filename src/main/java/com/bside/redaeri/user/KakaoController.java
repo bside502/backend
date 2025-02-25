@@ -7,15 +7,19 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.bside.redaeri.util.JwtUtil;
+import com.bside.redaeri.filter.JWTService;
 
 @RestController
 @RequestMapping("/api/v1/")
 public class KakaoController {
+	
+	@Autowired
+	private JWTService jwtService;
 	
 	private static final String KAKAO_API_URL = "https://kauth.kakao.com/oauth/token";
 	private static final String KAKAO_USER_INFO_URL = "https://kapi.kakao.com/v2/user/me";
@@ -36,7 +40,7 @@ public class KakaoController {
 			Map<String, Object> userInfo = getUserProfile(accessToken);
 			// todo 이미 등록된 회원인지 확인
 			
-			String jwtToken = JwtUtil.generateToken(userInfo.get("id").toString());
+			String jwtToken = jwtService.generateToken(userInfo);
 			
 		} catch (Exception e) {
 			e.printStackTrace();
