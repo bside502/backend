@@ -59,7 +59,7 @@ public class JWTFilter extends OncePerRequestFilter {
 		
 		String token = request.getHeader("token");
 		try {
-			String userIdx = jwtService.getUserIdx(token);
+			int userIdx = jwtService.getUserIdx(token);
 			request.setAttribute("user_idx", userIdx);
 		} catch (Exception e) {
 			// 토큰 없는 경우

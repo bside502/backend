@@ -1,4 +1,4 @@
-package com.bside.redaeri.user;
+package com.bside.redaeri.login;
 
 import java.io.BufferedReader;
 import java.io.IOException;

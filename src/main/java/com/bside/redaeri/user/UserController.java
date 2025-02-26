@@ -9,11 +9,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bside.redaeri.filter.JWTService;
+import com.bside.redaeri.login.LoginIdx;
 
 import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
-@RequestMapping("/api/v1/")
+@RequestMapping("/api/v1")
 public class UserController {
 	
 	@Autowired
@@ -23,15 +24,24 @@ public class UserController {
 	private JWTService jwtService;
 
 	@GetMapping("/user/get")
-	public Map<String, Object> userGet(HttpServletRequest request) throws Exception {
+	public Map<String, Object> userGet(@LoginIdx Integer loginIdx) throws Exception {
+
+		return userService.getInfo(loginIdx);
+	}
+	
+	@GetMapping("/user/test")
+	public Map<String, Object> userTest(@LoginIdx Integer loginIdx) throws Exception {
 		//String token = JwtUtil.getUserIdx(request.getHeader("token"));
 		
+		//System.out.println("@LoginIdx ==> " + loginIdx);
+		
+		
 		Map<String, Object> map = new HashMap<>();
-		map.put("user_idx", 2);
+		map.put("login_idx", 1);
 		
 		String token = jwtService.generateToken(map);
 		System.out.println("token ==> " + token);
 		
-		return userService.getInfo();
+		return null;
 	}
 }

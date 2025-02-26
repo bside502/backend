@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.bside.redaeri.user.userMapper">
+<mapper namespace="com.bside.redaeri.user.UserMapper">
 	<select id="getUserId" parameterType="HashMap" resultType="HashMap">
 		SELECT
 			user_id
@@ -10,13 +10,26 @@
 			user_id = #{user_id}
 	</select>
 	
-	<select id="getUserInfo" parameterType="HashMap" resultType="HashMap">
+	<select id="getUserInfo" parameterType="Integer" resultType="HashMap">
 		SELECT
-			idx as user_idx
-			, user_id
+			u.idx 				as userIdx
+			, user_id 			as userId
+			, store_name 		as storeName
+			, store_type 		as storeType
+			, store_img 		as storeImg
+			, persona_select 	as personaSelect
+			, emotion_select 	as emotionSelect
+			, length_select 	as lengthSelect
+			, all_answer 		as allAnswer
 		FROM
-			user
+			user u
+		LEFT JOIN
+			store s
+		ON	s.user_idx = u.idx 
+		LEFT JOIN
+			persona p 
+		ON	s.idx = p.store_idx
 		WHERE
-			idx = #{login_idx}
+			u.idx = #{loginIdx};
 	</select>
 </mapper>

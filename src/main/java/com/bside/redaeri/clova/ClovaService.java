@@ -5,46 +5,40 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
 public class ClovaService {
 	
-	// clova studio
-	public static void generateChatResponse(String[] args) {
+	@Value("${clova.api.key}")
+	private String API_KEY;
+	
+	@Value("${clova.request.id}")
+	private String REQUEST_ID;
+	
+	//clova studio
+	public void generateChatResponse() {
         String urlString = "https://clovastudio.stream.ntruss.com/testapp/v1/chat-completions/HCX-DASH-001";
-        String apiKey = "<api-key>";  // 여기에 API 키 입력
-        String requestId = "8f5ccf25af4b4c639642c9fcfd330719";
+       
 
-        String jsonInputString = "{"
-                + "\"messages\": ["
-                + "{\"role\": \"system\", \"content\": \"\"},"
-                + "{\"role\": \"user\", \"content\": \"\"}"
-                + "],"
-                + "\"topP\": 0.8,"
-                + "\"topK\": 0,"
-                + "\"maxTokens\": 256,"
-                + "\"temperature\": 0.5,"
-                + "\"repeatPenalty\": 5.0,"
-                + "\"stopBefore\": [],"
-                + "\"includeAiFilters\": true,"
-                + "\"seed\": 0"
-                + "}";
-
+        String prompt = ClovaPromptTemplates.TEXT_PATTEN_ANALYZE;
+        // todo 프롬프트 선택할 수 있도록
+        
         try {
             // URL 설정
             URL url = new URL(urlString);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("POST");
-            conn.setRequestProperty("Authorization", "Bearer " + apiKey);
-            conn.setRequestProperty("X-NCP-CLOVASTUDIO-REQUEST-ID", requestId);
+            conn.setRequestProperty("Authorization", "Bearer " + API_KEY);
+            conn.setRequestProperty("X-NCP-CLOVASTUDIO-REQUEST-ID", REQUEST_ID);
             conn.setRequestProperty("Content-Type", "application/json");
             conn.setRequestProperty("Accept", "text/event-stream");
             conn.setDoOutput(true);
 
             // 요청 데이터 전송
             try (OutputStream os = conn.getOutputStream()) {
-                byte[] input = jsonInputString.getBytes(StandardCharsets.UTF_8);
+                byte[] input = prompt.getBytes(StandardCharsets.UTF_8);
                 os.write(input, 0, input.length);
             }
 
@@ -68,4 +62,9 @@ public class ClovaService {
             e.printStackTrace();
         }
     }
+	
+	// clova ocr
+	public static void imageTextExtract() {
+		
+	}
 }

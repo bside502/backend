@@ -14,14 +14,28 @@ server:
   port: 8080
 
 mybatis:
-  mapper-locations: mappers/*.xml
+  mapper-locations: sql/*.xml
   configuration:
     call-setters-on-nulls: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl  # SQL 로그 활성화
+
 
 
 jwt:
   secret:
     key: qltkdlemdnflxlaWkddlekdngkgkdjfakskzlfmfejsmffudigkfRk1
+
+
+clova:
+  api:
+    key: ENC(9UcAhXAsO87Q4xfMwgfJ95nrnW4IxGcpZBFsLC0BflghBCMxJsYlQ/xxGWZQZioHauL/oNxOfpBxL6usXsKFzjHTQwwIlTlOzFmxZMhsD1A=)
+  request:
+    id: ENC(vmhTZV8TQtZoiBzrfj+5Sk/VU+6SSENrlZ+oV3WWIdGE9pfKOum962gjSPyMaTJiD74+FVhwJQz3+bBReR87ZGFaIFrJ1tXCVAsfWGxmFQo=)
+
+logging:
+  level:
+    root: INFO
+    org.apache.ibatis: DEBUG  # MyBatis SQL 실행 로그
 
 ---
 
@@ -32,7 +46,7 @@ spring:
       - local
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/redaeri?serverTimezone=UTC&characterEncoding=UTF-8
+    url: jdbc:mysql://localhost:3307/redaeri?serverTimezone=UTC&characterEncoding=UTF-8
     username: ENC(ttOlbqf+jEsgiKszV/DrLFz7EqAGyGmRty5zBKQYPb42XRxX3BIkA7hMbIZi4XqZ)
     password: ENC(5O7so2/IIbHAxjsaYcV6H5fls9fy5xQ7Fj8U1ZuiLpojFM3nnDZ92J3+96OCWkfC)
 

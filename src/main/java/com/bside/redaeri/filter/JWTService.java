@@ -15,6 +15,7 @@ import io.jsonwebtoken.Jwts;
 
 @Service
 public class JWTService {
+	
 	@Value("${jwt.secret.key}")
 	private String key;
 	
@@ -45,19 +46,23 @@ public class JWTService {
 		 return generateToken(param);
 	 }
 	 
-	 public String getUserIdx(String jwt) {
+	 public Integer getUserIdx(String jwt) {
 		 String accessToken = jwt;
 		 if(accessToken == null || accessToken.length() == 0) {
 			 return null;
 		 }
 		 
-		// 값 가져오기
-		return Jwts.parser()
-				.verifyWith(secretKey())
-				.build()
-				.parseSignedClaims(jwt)
-				.getPayload()
-				.get("user_idx", String.class);
+		 Integer idx = Jwts.parser()
+					.verifyWith(secretKey())
+					.build()
+					.parseSignedClaims(jwt)
+					.getPayload()
+					.get("login_idx", Integer.class);
+		 
+		 if(idx == null) {
+			 idx = 0;
+		 }
+		 return idx;
 	 }
 	 
 	 // 로그인 만료 시간
