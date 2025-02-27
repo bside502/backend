@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -30,7 +31,8 @@ public class UserController {
 	}
 	
 	@GetMapping("/user/test")
-	public Map<String, Object> userTest(@LoginIdx Integer loginIdx) throws Exception {
+	public Map<String, Object> userTest() throws Exception {
+		//@LoginIdx Integer loginIdx
 		//String token = JwtUtil.getUserIdx(request.getHeader("token"));
 		
 		//System.out.println("@LoginIdx ==> " + loginIdx);
@@ -42,6 +44,20 @@ public class UserController {
 		String token = jwtService.generateToken(map);
 		System.out.println("token ==> " + token);
 		
-		return null;
+		map.put("token", token);
+		return map;
 	}
+	
+	@GetMapping("/user/answer/count")
+	public Map<String, Object> userAnswerCount(@LoginIdx Integer loginIdx) {
+		
+		return userService.countUserAnswer(loginIdx);
+	}
+	
+	@DeleteMapping("/user/delete")
+	public Map<String, Object> userDelete(@LoginIdx Integer loginIdx) {
+		
+		return userService.deleteUser(loginIdx);
+	}
+	
 }

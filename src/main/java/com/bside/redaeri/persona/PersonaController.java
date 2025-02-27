@@ -73,8 +73,6 @@ public class PersonaController {
 	@GetMapping("/persona/get")
 	public Map<String, Object> personaGet(@LoginIdx Integer loginIdx) {
 		
-		System.out.println("loginId x------ >" + loginIdx);
-		
 		return personaService.getPersonaInfo(loginIdx);
 	}
 	

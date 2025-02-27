@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bside.redaeri.answer.AnswerMapper">
+
+	<insert id="insertAnswerGenerateLog" parameterType="HashMap">
+		INSERT INTO answer_generate_log (
+			user_idx
+			, store_idx
+			, persona_idx
+			, content
+			, result
+			, review_score
+			, include_text
+			, review_type
+		) VALUE {
+			#{loginIdx}
+			, #{sotreIdx}
+			, #{personaIdx}
+			, #{content}
+			, #{result}
+			, #{reviewScore}
+			, #{includeText}
+			, #{reviewType}
+		}
+	</insert>
+	
+	<select id="getAnswerGenerateLogList" parameterType="Integer" resultType="HashMap">
+		SELECT
+			idx as answerGenerateLogIdx
+		FROM
+			answer_generate_log
+		WHERE
+			user_idx = #{loginIdx}
+		ORDER BY
+			insert_date
+		LIMIT 20;
+	</select>
+
+
+</mapper>

@@ -32,4 +32,15 @@
 		WHERE
 			u.idx = #{loginIdx};
 	</select>
+	
+	
+	<select id="countUserAnswer" parameterType="Integer" resultType="int">
+		SELECT
+			COUNT(*)
+		FROM
+			answer_generate_log
+		WHERE
+			user_idx = #{loginIdx}
+	</select>
+	
 </mapper>

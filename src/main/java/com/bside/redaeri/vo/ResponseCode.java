@@ -8,7 +8,6 @@ import lombok.Getter;
  * 응답 코드
  */
 
-@Getter
 public enum ResponseCode {
 	// Success
 	OK("200", HttpStatus.OK, "OK"),
@@ -29,5 +28,17 @@ public enum ResponseCode {
 		this.code = code;
 		this.httpStatus = httpStatus;
 		this.message = message;
+	}
+	
+	public String getCode() {
+		return code;
+	}
+	
+    public HttpStatus getHttpStatus() {
+        return httpStatus;
+    }
+	
+	public String getMessage() {
+		return message;
 	}
 }

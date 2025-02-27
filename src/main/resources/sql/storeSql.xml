@@ -12,7 +12,7 @@
 	
 
 	<insert id="insertStoreInfo" parameterType="HashMap">
-		INSERT INTO STORE(
+		INSERT INTO store(
 			store_name
 			, store_type
 			, user_idx
@@ -24,7 +24,7 @@
 	</insert>
 	
 	<update id="updateStoreInfo" parameterType="HashMap">
-		UPDATE STORE
+		UPDATE store
 		SET
 			store_name = #{storeName}
 			, store_type = #{storeType}

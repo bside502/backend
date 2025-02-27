@@ -13,10 +13,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
-@RequiredArgsConstructor
 public class JWTFilter extends OncePerRequestFilter {
-	
 	@Value("${jwt.secret.key}")
 	private String SECRET_KEY;
 	
@@ -69,5 +66,4 @@ public class JWTFilter extends OncePerRequestFilter {
 		System.out.println("request Url ==> " + requestURI);
         filterChain.doFilter(request, response);
 	}
-	
 }

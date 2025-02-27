@@ -2,13 +2,7 @@ spring:
   application:
     name: redaeri
   profiles:
-    active: local
-  devtools:
-    livereload:
-      enabled: true
-    restart:
-      enabled: true
-
+    active: dev
 
 server:
   port: 8080
@@ -59,7 +53,7 @@ spring:
       - dev
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: ENC(oA/nTK5Pn6v4SeNmCAGONe2hwcOH7MhQN8FiMVTwWxD0blBqOUzFL2sCHYN0m9ENIN/uvgTKzEvCoLidy9P0lCwmj8agRzRSrzP+UnRous+WwA0Rt7b8nLSLVS/B+/Z4yq4bKfSNgvMEePzIJMMbTQHdGiuxSLogURqZwk++Heg=)
-    username: ENC(P6UNoqXzWUpPbNsHg28y26gzmBAse+Vh7GFN4tIfenWuAKsKM6+pSlz+YMMLkK2i)
-    password: ENC(cdJ8XgTHfAqDhTDhZTW9Ayk55guy85G2lbczlxNHKlAPyw6L0DBjmhXjRArtFz3P)
+    url: ENC(83FpbS6GrhoJjK4yrZqfJ9T0mPWAbHuIA2ebFQREm/WCc1sqspeDqCkwQ9zSoofxy8f464Ay5XPSuJKop//NnYRDPqDQxhl9g5LLcRTvg/Cwpqx89vnSla9GFyKu7bso2JI88SIWe4IysO77CLdp9EUzStwrh3SKwzCm/LGqdfw=)
+    username: ENC(at0vUhvo6SgjXkxjOulOdzXLUb1Pne8lAP+7ZR+GiPCQ2ha/lr9n/8NH7bJQ7M1x)
+    password: ENC(bPrwxSJhPCW90gRJLxaK+JOji9ZVXxZabP1oDgzgUWLnfsv7361qpIwlnhqjbHsq)
 

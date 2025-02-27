@@ -8,6 +8,8 @@ import java.nio.charset.StandardCharsets;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import org.springframework.http.*;
+import org.springframework.web.client.RestTemplate;
 @Service
 public class ClovaService {
 	
@@ -16,6 +18,9 @@ public class ClovaService {
 	
 	@Value("${clova.request.id}")
 	private String REQUEST_ID;
+	
+	private static final String API_URL = "https://your-api-gateway.apigw.ntruss.com/ocr/analyze";
+	private static final String API_OCR_KEY = "발급받은 API Key";
 	
 	//clova studio
 	public void generateChatResponse() {
@@ -64,7 +69,20 @@ public class ClovaService {
     }
 	
 	// clova ocr
-	public static void imageTextExtract() {
+	public static String imageTextExtract(String base64Image) {
+		RestTemplate restTemplate = new RestTemplate();
 		
+		//todo images 형태 검사 추출
+	        
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("X-NCP-APIGW-API-KEY-ID", API_OCR_KEY);
+        
+        String requestBody = "{ \"version\": \"V2\", \"images\": [{ \"format\": \"jpg\", \"name\": \"sample\", \"data\": \"" + base64Image + "\" }]}";
+
+        HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
+        ResponseEntity<String> response = restTemplate.exchange(API_URL, HttpMethod.POST, entity, String.class);
+
+        return response.getBody();
 	}
 }

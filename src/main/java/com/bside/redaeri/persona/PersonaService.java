@@ -27,6 +27,8 @@ public class PersonaService {
 	public Map<String, Object> personaAnalyze(Map<String, Object> param) {
 		clovaService.generateChatResponse();
 		
+		
+		
 		return param;
 	}
 	
@@ -38,7 +40,12 @@ public class PersonaService {
 	 */
 	public Map<String, Object> insertPersonaInfo(Map<String, Object> param) {
 		
-		return ResponseUtil.error(ResponseCode.FAIL);
+		int result = personaMapper.insertPersonaInfo(param);
+		if(result != 0) {
+			return ResponseUtil.success();
+		} else {
+			return ResponseUtil.error(ResponseCode.FAIL);
+		}
 	}
 	
 	/**
@@ -48,7 +55,12 @@ public class PersonaService {
 	 */
 	public Map<String, Object> updatePersonaInfo(Map<String, Object> param) {
 		
-		return ResponseUtil.error(ResponseCode.FAIL);
+		int result = personaMapper.updatePersonaInfo(param);
+		if(result != 0) {
+			return ResponseUtil.success();
+		} else {
+			return ResponseUtil.error(ResponseCode.FAIL);
+		}
 	}
 	
 	

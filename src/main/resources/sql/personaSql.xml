@@ -16,4 +16,31 @@
 		WHERE
 			s.user_idx = #{loginIdx}
 	</select>
+	
+	<!-- 말투 직접 선택해서 저장 -->
+	<insert id="insertPersonaInfo" parameterType="HashMap">
+		INSERT INTO persona (
+			persona_select
+			, emotion_select
+			, length_select
+			, all_answer
+		) VALUE (
+			#{personaSelect}
+			, #{emotionSelect}
+			, #{lengthSelect}
+			, #{allAnswer}
+		)
+	</insert>
+	
+	<!-- 말투 직접 수정해서 저장 -->
+	<update id="updatePersonaInfo" parameterType="HashMap">
+		UPDATE persona
+		SET
+			persona_select = #{personaSelect}
+			, emotion_select = #{personaSelect}
+			, length_select = #{lengthSelect}
+			, all_answer = #{allAnswer}
+		WHERE
+			idx = #{personaIdx}
+	</update>
 </mapper>

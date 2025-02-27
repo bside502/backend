@@ -37,4 +37,28 @@ public class UserService {
 		
 	}
 	
+	/**
+	 * 회원이 생성한 답변 갯수
+	 * @param loginIdx
+	 * @return
+	 */
+	public Map<String, Object> countUserAnswer(Integer loginIdx) {
+		
+		int cnt = userMapper.countUserAnswer(loginIdx);
+		
+		Map<String, Object> result = new HashMap<>();
+		result.put("answerCount", cnt);
+		
+		return ResponseUtil.success(result);
+	}
+	
+	public Map<String, Object> deleteUser(Integer loginIdx) {
+		
+		userMapper.deleteUser(loginIdx);
+		// 가게 정보
+		// 페르소나
+		// 로그 삭제
+		
+		return ResponseUtil.success();
+	}
 }
