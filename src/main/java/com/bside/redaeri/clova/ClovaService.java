@@ -4,7 +4,10 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -19,8 +22,8 @@ public class ClovaService {
 	@Value("${clova.request.id}")
 	private String REQUEST_ID;
 	
-	private static final String API_URL = "https://your-api-gateway.apigw.ntruss.com/ocr/analyze";
-	private static final String API_OCR_KEY = "발급받은 API Key";
+	private static final String API_URL = "";
+	private static final String API_OCR_KEY = "";
 	
 	//clova studio
 	public void generateChatResponse() {
@@ -69,20 +72,67 @@ public class ClovaService {
     }
 	
 	// clova ocr
-	public static String imageTextExtract(String base64Image) {
+	public String imageTextExtract(Map<String, Object> imgInfo) {
 		RestTemplate restTemplate = new RestTemplate();
 		
 		//todo images 형태 검사 추출
 	        
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("X-NCP-APIGW-API-KEY-ID", API_OCR_KEY);
+        headers.set("X-OCR-SECRET", API_OCR_KEY);
         
-        String requestBody = "{ \"version\": \"V2\", \"images\": [{ \"format\": \"jpg\", \"name\": \"sample\", \"data\": \"" + base64Image + "\" }]}";
+        String requestBody = "{ \"version\": \"V2\", "
+                + "\"requestId\": \"" + imgInfo.get("requestId") + "\", "
+                + "\"timestamp\": " + imgInfo.get("timestamp") + ", "
+                + "\"images\": ["
+                + "{ \"format\": \"" + imgInfo.get("format") + "\", "
+                + "\"name\": \"" + imgInfo.get("name") + "\", "
+                + "\"data\": \"" + imgInfo.get("data") + "\" }]}";
 
         HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
         ResponseEntity<String> response = restTemplate.exchange(API_URL, HttpMethod.POST, entity, String.class);
 
-        return response.getBody();
+        StringBuilder result = new StringBuilder();
+        try {
+            JSONObject jsonObj = new JSONObject(response.getBody());
+            
+            // Check if the JSON contains the expected structure
+            if (jsonObj.has("images")) {
+                JSONArray images = jsonObj.getJSONArray("images");
+                
+                for (int i = 0; i < images.length(); i++) {
+                    JSONObject image = images.getJSONObject(i);
+                    
+                    // Check if inferResult is SUCCESS
+                    if ("SUCCESS".equals(image.getString("inferResult"))) {
+                        // Get the fields array
+                        if (image.has("fields")) {
+                            JSONArray fields = image.getJSONArray("fields");
+                            
+                            for (int j = 0; j < fields.length(); j++) {
+                                JSONObject field = fields.getJSONObject(j);
+                                
+                                // Extract inferText
+                                if (field.has("inferText")) {
+                                    String inferText = field.getString("inferText");
+                                    result.append(inferText);
+                                    
+                                    // Add space or newline based on lineBreak flag
+                                    if (field.has("lineBreak") && field.getBoolean("lineBreak")) {
+                                    	result.append("\n");
+                                    } else {
+                                    	result.append(" ");
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            return "Error parsing JSON: " + e.getMessage();
+        }
+        
+        return result.toString().trim();
 	}
 }

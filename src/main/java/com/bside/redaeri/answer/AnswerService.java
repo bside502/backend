@@ -1,6 +1,12 @@
 package com.bside.redaeri.answer;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.time.Instant;
+import java.util.Base64;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,17 +24,29 @@ public class AnswerService {
 	@Autowired
 	private AnswerMapper answerMapper;
 	
-	public Map<String, Object> readImageToText(Map<String, Object> param, MultipartFile file) {
+	public Map<String, Object> readImageToText(MultipartFile mFile) throws IOException {
 		
-		/**
-		 * 파일을 읽고
-		 * ocr 에 보낸다.
-		 * 
-		 * 답변을 받고
-		 * return
-		 */
+		String name = mFile.getOriginalFilename();
+		String format = name.substring(name.lastIndexOf(".") + 1, name.length());
 		
-		return ResponseUtil.success();
+		System.out.println(name + ": " + format);
+		
+		Map<String, Object> imgInfo = new HashMap<>();
+		
+		imgInfo.put("requestId", UUID.randomUUID().toString());
+		imgInfo.put("timestamp", Instant.now().toEpochMilli());
+		imgInfo.put("format", format);
+		imgInfo.put("name", name);
+		imgInfo.put("data", Base64.getEncoder().encodeToString(mFile.getBytes()));
+		
+		String answer = clovaService.imageTextExtract(imgInfo);
+		
+		System.out.println("answer --> " + answer);
+		
+		Map<String, Object> result = new HashMap<>();
+		result.put("text", answer);
+		
+		return ResponseUtil.success(result);
 	}
 	
 	public Map<String, Object> generateAnswer(Map<String, Object> param) {

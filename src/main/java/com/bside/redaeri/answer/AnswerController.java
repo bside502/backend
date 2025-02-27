@@ -1,5 +1,6 @@
 package com.bside.redaeri.answer;
 
+import java.io.IOException;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,9 +19,10 @@ public class AnswerController {
 	private AnswerService answerService;
 	
 	@PostMapping("/image/text/read")
-	public Map<String, Object> imageTextReader(@RequestParam Map<String, Object> param, MultipartFile file) {
+	public Map<String, Object> imageTextReader(@RequestParam("reviewImgFile") MultipartFile mFile) throws IOException {
+		//@RequestParam Map<String, Object> param
 		
-		return answerService.readImageToText(param, file);
+		return answerService.readImageToText(mFile);
 	}
 	
 	@PostMapping("/answer/generate")
