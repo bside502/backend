@@ -8,6 +8,7 @@ import java.net.URL;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,8 +24,13 @@ public class KakaoController {
 	
 	private static final String KAKAO_API_URL = "https://kauth.kakao.com/oauth/token";
 	private static final String KAKAO_USER_INFO_URL = "https://kapi.kakao.com/v2/user/me";
-	private static final String KAKAO_CLIENT_ID = "";
-	private static final String KAKAO_REDIRECT_URI = "";
+	
+	//REST API app key
+	@Value("${kakao.client.id}")
+	private static String KAKAO_CLIENT_ID;
+	
+	//redirect url
+	private static final String KAKAO_REDIRECT_URI = "http://localhost:5671/oauth";
 	
 	private static final String CONTENT_TYPE = "application/x-www-form-urlencoded;charset=utf-8";
 	

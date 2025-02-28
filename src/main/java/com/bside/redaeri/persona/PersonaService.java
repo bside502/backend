@@ -1,14 +1,22 @@
 // PersonaService.java
 package com.bside.redaeri.persona;
 
+import java.io.IOException;
+import java.time.Instant;
+import java.util.Base64;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.bside.redaeri.clova.ClovaService;
-import com.bside.redaeri.util.ResponseUtil;
-import com.bside.redaeri.vo.ResponseCode;
+import com.bside.redaeri.util.ApiResult;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 public class PersonaService {
@@ -21,15 +29,92 @@ public class PersonaService {
 	
 	/**
 	 * 말투 분석 후 정보 저장
-	 * @param param
+	 * @param 
 	 * @return
+	 * @throws IOException 
 	 */
-	public Map<String, Object> personaAnalyze(Map<String, Object> param) {
-		clovaService.generateChatResponse();
+	public ApiResult<Object> personaAnalyze(AnalyzeDto analyzeDto, Integer loginIdx) throws IOException {
 		
+		StringBuilder sb = new StringBuilder();
+		System.out.println(analyzeDto.getUploadFileList() + " : " + analyzeDto.getUploadFileList() == null);
+		if(analyzeDto.getUploadFileList() != null) {
+			for(MultipartFile mFile : analyzeDto.getUploadFileList()) {
+				String name = mFile.getOriginalFilename();
+				String format = name.substring(name.lastIndexOf(".") + 1, name.length());
+				Map<String, Object> imgInfo = new HashMap<>();
+				
+				// todo 한번에 보낼 수 있도록 수정
+				imgInfo.put("requestId", UUID.randomUUID().toString());
+				imgInfo.put("timestamp", Instant.now().toEpochMilli());
+				imgInfo.put("format", format);
+				imgInfo.put("name", name);
+				imgInfo.put("data", Base64.getEncoder().encodeToString(mFile.getBytes()));
+			
+				String answer = clovaService.imageTextExtract(imgInfo);
+				sb.append("[리뷰 내용]\n").append(answer);
+			}
+			sb.append("\n\n");
+		}
 		
+		if(analyzeDto.getUploadTextFirst() != null) {
+			sb.append("[리뷰 내용]\n").append(analyzeDto.getUploadTextFirst());
+			sb.append("\n\n");
+		}
+		if(analyzeDto.getUploadTextSecond() != null) {
+			sb.append("[리뷰 내용]\n").append(analyzeDto.getUploadTextSecond());
+			sb.append("\n\n");
+		}
+		if(analyzeDto.getUploadTextThird() != null) {
+			sb.append("[리뷰 내용]\n").append(analyzeDto.getUploadTextThird());
+		}
 		
-		return param;
+		String analyze = clovaService.generateChatResponse(sb.toString(), "TPA");
+		
+		//1. 클로바에 말투 분석 요청
+		//2. 답변을 받고 
+		//3. 형식에 맞게 전달.
+		System.out.println("analyze --> " + analyze);
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode rootNode = objectMapper.readTree(analyze);
+        
+        String persona = rootNode.path("persona").asText();
+        String emotion = rootNode.path("emotion").asText();
+        String length = rootNode.path("length").asText();
+        String answer = rootNode.path("answer").asText();
+            
+        
+        PersonaDto personaDto = new PersonaDto();
+        personaDto.setPersonaSelect(persona);
+        personaDto.setEmotionSelect(emotion);
+        personaDto.setLengthSelect(length);
+        personaDto.setAllAnswer(answer);
+        
+        int type = 0;
+        if(persona.contains("알바생")) {
+        	type = 1;
+        } else if(persona.contains("청년")) {
+        	type = 2;
+        } else if(persona.contains("초보")) {
+        	type = 3;
+        } else if(persona.contains("유쾌한")) {
+        	type = 4;
+        } else if(persona.contains("최선")) {
+        	type = 5;
+        }
+        personaDto.setPersonaImgType(type);
+        
+        
+        // 임시, storeIdx
+        int storeIdx = personaMapper.getStoreIdx(loginIdx);
+        
+        personaDto.setStoreIdx(storeIdx);
+        
+        
+        personaMapper.insertPersonaInfo(personaDto);
+        
+		Map<String, Object> result = new HashMap<>();
+		result.put("result", analyze);
+		return ApiResult.success("200", "성공", result);
 	}
 	
 	
@@ -38,13 +123,15 @@ public class PersonaService {
 	 * @param param
 	 * @return
 	 */
-	public Map<String, Object> insertPersonaInfo(Map<String, Object> param) {
+	public ApiResult<Object> insertPersonaInfo(PersonaDto personaDto) {
 		
-		int result = personaMapper.insertPersonaInfo(param);
+		// todo clova 만능답변 만들어줘
+		
+		int result = personaMapper.insertPersonaInfo(personaDto);
 		if(result != 0) {
-			return ResponseUtil.success();
+			return ApiResult.success("200", "성공", null);
 		} else {
-			return ResponseUtil.error(ResponseCode.FAIL);
+			return ApiResult.success("400", "실패", null);
 		}
 	}
 	
@@ -53,13 +140,13 @@ public class PersonaService {
 	 * @param param
 	 * @return
 	 */
-	public Map<String, Object> updatePersonaInfo(Map<String, Object> param) {
+	public ApiResult<Object> updatePersonaInfo(PersonaDto personaDto) {
 		
-		int result = personaMapper.updatePersonaInfo(param);
+		int result = personaMapper.updatePersonaInfo(personaDto);
 		if(result != 0) {
-			return ResponseUtil.success();
+			return ApiResult.success("200", "성공", null);
 		} else {
-			return ResponseUtil.error(ResponseCode.FAIL);
+			return ApiResult.success("400", "실패", null);
 		}
 	}
 	
@@ -69,12 +156,12 @@ public class PersonaService {
 	 * @param param
 	 * @return
 	 */
-	public Map<String, Object> updatePersonaAnswer(Map<String, Object> param) {
-		int result = personaMapper.updatePersonaAnswer(param);
+	public ApiResult<Object> updatePersonaAnswer(PersonaDto personaDto) {
+		int result = personaMapper.updatePersonaAnswer(personaDto);
 		if(result == 1) {
-			return ResponseUtil.success();
+			return ApiResult.success("200", "성공", null);
 		} else {
-			return ResponseUtil.error(ResponseCode.FAIL);
+			return ApiResult.success("400", "실패", null);
 		}
 	}
 	
@@ -83,13 +170,15 @@ public class PersonaService {
 	 * @param loginIdx
 	 * @return
 	 */
-	public Map<String, Object> getPersonaInfo(int loginIdx) {
-		Map<String, Object> result = personaMapper.getPersonaInfo(loginIdx);
+	public ApiResult<Object> getPersonaInfo(int loginIdx) {
+		int storeIdx = personaMapper.getStoreIdx(loginIdx);
+		
+		Map<String, Object> result = personaMapper.getPersonaInfo(storeIdx);
 		
 		if(result != null) {
-			return ResponseUtil.success(result);
+			return ApiResult.success("200", "성공", result);
 		} else {
-			return ResponseUtil.error(ResponseCode.FAIL);
+			return ApiResult.success("400", "실패", null);
 		}
 	}
 }

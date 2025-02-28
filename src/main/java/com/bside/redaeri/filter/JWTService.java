@@ -57,7 +57,7 @@ public class JWTService {
 					.build()
 					.parseSignedClaims(jwt)
 					.getPayload()
-					.get("login_idx", Integer.class);
+					.get("loginIdx", Integer.class);
 		 
 		 if(idx == null) {
 			 idx = 0;

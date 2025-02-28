@@ -11,6 +11,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.bside.redaeri.login.LoginIdx;
+import com.bside.redaeri.util.ApiResult;
+
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+
 @RestController
 @RequestMapping("/api/v1")
 public class AnswerController {
@@ -18,16 +23,25 @@ public class AnswerController {
 	@Autowired
 	private AnswerService answerService;
 	
+	@SecurityRequirement(name = "token")
 	@PostMapping("/image/text/read")
-	public Map<String, Object> imageTextReader(@RequestParam("reviewImgFile") MultipartFile mFile) throws IOException {
-		//@RequestParam Map<String, Object> param
+	public ApiResult<Object> imageTextReader(@RequestParam("reviewImgFile") MultipartFile mFile) throws IOException {
 		
 		return answerService.readImageToText(mFile);
 	}
 	
+	@SecurityRequirement(name = "token")
 	@PostMapping("/answer/generate")
-	public Map<String, Object> answerGenerate(@RequestBody Map<String, Object> param) {
+	public ApiResult<Object> answerGenerate(@LoginIdx Integer loginIdx, @RequestBody AnswerDto answerDto) {
+		answerDto.setLogIdx(loginIdx);
 		
-		return answerService.generateAnswer(param);
+		return answerService.generateAnswer(answerDto);
+	}
+	
+	@SecurityRequirement(name = "token")
+	@PostMapping("/answer/log/get")
+	public ApiResult<Object> answerLogGet(@LoginIdx Integer loginIdx) {
+		
+		return answerService.getAnswerLog(loginIdx);
 	}
 }

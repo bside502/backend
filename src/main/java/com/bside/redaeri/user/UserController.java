@@ -11,8 +11,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bside.redaeri.filter.JWTService;
 import com.bside.redaeri.login.LoginIdx;
+import com.bside.redaeri.util.ApiResult;
 
-import jakarta.servlet.http.HttpServletRequest;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -22,40 +23,45 @@ public class UserController {
 	private UserService userService;
 	
 	@Autowired
+	private UserMapper userMapper;
+	
+	@Autowired
 	private JWTService jwtService;
 
+	@SecurityRequirement(name = "token")
 	@GetMapping("/user/get")
-	public Map<String, Object> userGet(@LoginIdx Integer loginIdx) throws Exception {
+	public ApiResult<Object> userGet(@LoginIdx Integer loginIdx) throws Exception {
 
 		return userService.getInfo(loginIdx);
 	}
 	
-	@GetMapping("/user/test")
-	public Map<String, Object> userTest() throws Exception {
-		//@LoginIdx Integer loginIdx
-		//String token = JwtUtil.getUserIdx(request.getHeader("token"));
-		
-		//System.out.println("@LoginIdx ==> " + loginIdx);
-		
-		
+	
+	@GetMapping("/user/test/token")
+	public Map<String, Object> userAdd() throws Exception {
 		Map<String, Object> map = new HashMap<>();
-		map.put("login_idx", 1);
 		
+		UserDto user = new UserDto();
+		user.setUserId("test");
+		
+		userMapper.insertUser(user);
+		
+		map.put("loginIdx", user.getIdx());
 		String token = jwtService.generateToken(map);
-		System.out.println("token ==> " + token);
 		
 		map.put("token", token);
 		return map;
 	}
 	
+	@SecurityRequirement(name = "token")
 	@GetMapping("/user/answer/count")
-	public Map<String, Object> userAnswerCount(@LoginIdx Integer loginIdx) {
+	public ApiResult<Object> userAnswerCount(@LoginIdx Integer loginIdx) {
 		
 		return userService.countUserAnswer(loginIdx);
 	}
 	
+	@SecurityRequirement(name = "token")
 	@DeleteMapping("/user/delete")
-	public Map<String, Object> userDelete(@LoginIdx Integer loginIdx) {
+	public ApiResult<Object> userDelete(@LoginIdx Integer loginIdx) {
 		
 		return userService.deleteUser(loginIdx);
 	}

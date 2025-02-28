@@ -64,6 +64,9 @@ dependencies {
 	//json
 	implementation 'org.json:json:20250107'
 	
+	//swegger
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.5'
+	
 }
 
 tasks.named('test') {

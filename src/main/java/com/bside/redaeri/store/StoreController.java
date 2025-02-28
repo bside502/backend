@@ -10,6 +10,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bside.redaeri.login.LoginIdx;
+import com.bside.redaeri.util.ApiResult;
+
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 @RestController
 @RequestMapping("/api/v1/")
@@ -18,19 +21,21 @@ public class StoreController {
 	@Autowired
 	public StoreService storeService;
 	
+	@SecurityRequirement(name = "token")
 	@PostMapping("/store/insert")
-	public Map<String, Object> storeInsert(@LoginIdx Integer loginIdx, @RequestBody Map<String, Object> param) {
+	public ApiResult<Object> storeInsert(@LoginIdx Integer loginIdx, @RequestBody StoreDto storeDto) {
 		
-		param.put("loginIdx", loginIdx);
+		storeDto.setLoginIdx(loginIdx);
 		
-		return storeService.insertStoreInfo(param);
+		return storeService.insertStoreInfo(storeDto);
 	}
 	
+	@SecurityRequirement(name = "token")
 	@PatchMapping("/store/update")
-	public Map<String, Object> storeUpdate(@LoginIdx Integer loginIdx, @RequestBody Map<String, Object> param) {
+	public ApiResult<Object> storeUpdate(@LoginIdx Integer loginIdx, @RequestBody StoreDto storeDto) {
 		
-		param.put("loginIdx", loginIdx);
+		storeDto.setLoginIdx(loginIdx);
 		
-		return storeService.updateStoreInfo(param);
+		return storeService.updateStoreInfo(storeDto);
 	}
 }

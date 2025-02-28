@@ -1,15 +1,21 @@
 package com.bside.redaeri.store;
 
-import java.util.Map;
-
+import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 @Mapper
 public interface StoreMapper {
 	
-	public int getStoreCount(Map<String, Object> param);
+	@Select("SELECT COUNT(*) FROM store s WHERE s.user_idx = #{loginIdx}")
+	public int getStoreCount(StoreDto storeDto);
+
+	@Insert("INSERT INTO store(store_name, store_type, user_idx)"
+			+ "VALUES (#{storeName}, #{storeType}, #{loginIdx})")
+	public int insertStoreInfo(StoreDto storeDto);
 	
-	public int insertStoreInfo(Map<String, Object> param);
-	
-	public int updateStoreInfo(Map<String, Object> param);
+	@Update("UPDATE store SET store_name = #{storeName}, store_type = #{storeType} WHERE user_idx = #{loginIdx}")
+	public int updateStoreInfo(StoreDto storeDto);
+
 }

@@ -8,6 +8,7 @@ import java.net.URL;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,11 +24,16 @@ public class LoginController {
 	@Autowired
 	private JWTService jwtService;
 	
-	private static String NAVER_CLIENT_ID = "";
-	private static String NAVER_CLIENT_SECRET = "";
+	@Value("${naver.client.id}")
+	private static String NAVER_CLIENT_ID;
+	
+	@Value("${naver.client.key}")
+	private static String NAVER_CLIENT_SECRET;
 
 	private static String NAVER_TOKEN_URL = "https://nid.naver.com/oauth2.0/token";
 	private static String NAVER_USER_INFO_URL = "https://openapi.naver.com/v1/nid/me";
+	
+	private static String NAVER_CALLBACK_URL = "http://localhost:5671/login-callback";
 	
 	@PostMapping("/naver/callback")
 	public void naverCallback(@RequestBody Map<String, Object> param) throws IOException {

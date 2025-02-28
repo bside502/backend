@@ -7,8 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.bside.redaeri.filter.JWTService;
-import com.bside.redaeri.util.ResponseUtil;
-import com.bside.redaeri.vo.ResponseCode;
+import com.bside.redaeri.util.ApiResult;
 
 @Service
 public class UserService {
@@ -24,15 +23,15 @@ public class UserService {
 	 * @param param
 	 * @return
 	 */
-	public Map<String, Object> getInfo(Integer loginIdx) {
+	public ApiResult<Object> getInfo(Integer loginIdx) {
 		Map<String, Object> result = new HashMap<>();	
 		
 		result = userMapper.getUserInfo(loginIdx);
 		
 		if(result != null) {
-			return ResponseUtil.success(result);
+			return ApiResult.success("200", "성공", result);
 		} else {
-			return ResponseUtil.error(ResponseCode.FAIL);
+			return ApiResult.success("400", "실패", null);
 		}
 		
 	}
@@ -42,23 +41,23 @@ public class UserService {
 	 * @param loginIdx
 	 * @return
 	 */
-	public Map<String, Object> countUserAnswer(Integer loginIdx) {
+	public ApiResult<Object> countUserAnswer(Integer loginIdx) {
 		
 		int cnt = userMapper.countUserAnswer(loginIdx);
 		
 		Map<String, Object> result = new HashMap<>();
 		result.put("answerCount", cnt);
 		
-		return ResponseUtil.success(result);
+		return ApiResult.success("200", "성공", result);
 	}
 	
-	public Map<String, Object> deleteUser(Integer loginIdx) {
+	public ApiResult<Object> deleteUser(Integer loginIdx) {
 		
 		userMapper.deleteUser(loginIdx);
 		// 가게 정보
 		// 페르소나
 		// 로그 삭제
 		
-		return ResponseUtil.success();
+		return ApiResult.success("200", "성공", null);
 	}
 }

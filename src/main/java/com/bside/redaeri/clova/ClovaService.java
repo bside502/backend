@@ -1,5 +1,7 @@
 package com.bside.redaeri.clova;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -13,6 +15,9 @@ import org.springframework.stereotype.Service;
 
 import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 @Service
 public class ClovaService {
 	
@@ -22,17 +27,35 @@ public class ClovaService {
 	@Value("${clova.request.id}")
 	private String REQUEST_ID;
 	
-	private static final String API_URL = "";
-	private static final String API_OCR_KEY = "";
+	@Value("${clova.ocr.url}")
+	private static String API_URL;
+	
+	@Value("${clova.ocr.key}")
+	private static String API_OCR_KEY = "";
 	
 	//clova studio
-	public void generateChatResponse() {
+	
+	/**
+	 * TPA : TextPattenAnalyze (리뷰 분석 프롬프트)
+	 * AG : AnswerGenerate (답변 생성 프롬프트)
+	 * @param text
+	 * @param type
+	 * @return 
+	 */
+	public String generateChatResponse(String text, String type) {
         String urlString = "https://clovastudio.stream.ntruss.com/testapp/v1/chat-completions/HCX-DASH-001";
        
-
-        String prompt = ClovaPromptTemplates.TEXT_PATTEN_ANALYZE;
+        String prompt = "";
+        if(type.equals("TPA")) {
+        	prompt = ClovaPromptTemplates.TEXT_PATTHENANALYZE_PROMPT(text);
+        } else if(type.equals("AG")) {
+        	prompt = "";
+        }
         // todo 프롬프트 선택할 수 있도록
         
+        System.out.println(prompt);
+    	StringBuilder sb = new StringBuilder();
+
         try {
             // URL 설정
             URL url = new URL(urlString);
@@ -53,22 +76,47 @@ public class ClovaService {
             // 응답 코드 확인
             int responseCode = conn.getResponseCode();
             System.out.println("Response Code: " + responseCode);
+            
 
             // 응답 본문 출력
             if (responseCode == HttpURLConnection.HTTP_OK) {
-                try (java.util.Scanner scanner = new java.util.Scanner(conn.getInputStream(), StandardCharsets.UTF_8)) {
-                    scanner.useDelimiter("\\A");
-                    String response = scanner.hasNext() ? scanner.next() : "";
-                    System.out.println("Response: " + response);
+            	try (BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream(), StandardCharsets.UTF_8))) {
+                
+            		String line;
+            		while ((line = reader.readLine()) != null) {
+            			if (line.startsWith("data:")) {
+                            try {
+                                // "data:" 접두사 제거
+                                String jsonStr = line.substring(5);
+                                
+                                // 빈 라인 건너뛰기
+                                if (jsonStr.trim().isEmpty()) {
+                                    continue;
+                                }
+                                
+                                // JSON 파싱
+                                ObjectMapper objectMapper = new ObjectMapper();
+                                JsonNode rootNode = objectMapper.readTree(jsonStr);
+                                
+                                // content 값 추출 및 추가
+                                String content = rootNode.path("message").path("content").asText();
+                                sb.append(content);
+                                
+                                // 처리 로그 (선택적)
+                            } catch (Exception e) {
+                                System.err.println("JSON 파싱 오류: " + e.getMessage());
+                            }
+                        }
+            		}
                 }
             } else {
                 System.out.println("Error: " + responseCode);
             }
-
             conn.disconnect();
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return sb.toString();
     }
 	
 	// clova ocr

@@ -1,10 +1,10 @@
 package com.bside.redaeri.answer;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.time.Instant;
 import java.util.Base64;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.bside.redaeri.clova.ClovaService;
-import com.bside.redaeri.util.ResponseUtil;
+import com.bside.redaeri.util.ApiResult;
 
 @Service
 public class AnswerService {
@@ -24,7 +24,7 @@ public class AnswerService {
 	@Autowired
 	private AnswerMapper answerMapper;
 	
-	public Map<String, Object> readImageToText(MultipartFile mFile) throws IOException {
+	public ApiResult<Object> readImageToText(MultipartFile mFile) throws IOException {
 		
 		String name = mFile.getOriginalFilename();
 		String format = name.substring(name.lastIndexOf(".") + 1, name.length());
@@ -44,21 +44,34 @@ public class AnswerService {
 		System.out.println("answer --> " + answer);
 		
 		Map<String, Object> result = new HashMap<>();
-		result.put("text", answer);
+		result.put("reviewText", answer);
 		
-		return ResponseUtil.success(result);
+		return ApiResult.success("200", "성공", result);
 	}
 	
-	public Map<String, Object> generateAnswer(Map<String, Object> param) {
+	public ApiResult<Object> generateAnswer(AnswerDto answerDto) {
 		
+		// answerDTO 값 넘겨주기
+		String answer = clovaService.generateChatResponse("test", "AG");
 		/**
 		 * 1. clova 에 요청
 		 * 2. 답변 받고 DB 저장 후 return
 		 */
-
-		// 2
-		int cnt = answerMapper.insertAnswerGenerateLog(param);
+		// type 받아오기 
+		answerDto.setReviewType(answer);
+		answerDto.setGenerateAnswer(answer);
 		
-		return ResponseUtil.success();
+		int cnt = answerMapper.insertAnswerGenerateLog(answerDto);
+		
+		
+		return ApiResult.success("200", "성공", null);
 	}
+	
+	public ApiResult<Object> getAnswerLog(Integer loginIdx) {
+		
+		List<Map<String, Object>> result = answerMapper.getAnswerGenerateLogList(loginIdx);
+		
+		return ApiResult.success("200", "성공", result);
+	}
+
 }

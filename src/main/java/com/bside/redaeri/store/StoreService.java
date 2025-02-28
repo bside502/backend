@@ -1,12 +1,9 @@
 package com.bside.redaeri.store;
 
-import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.bside.redaeri.util.ResponseUtil;
-import com.bside.redaeri.vo.ResponseCode;
+import com.bside.redaeri.util.ApiResult;
 
 @Service
 public class StoreService {
@@ -14,35 +11,35 @@ public class StoreService {
 	@Autowired
 	public StoreMapper storeMapper;
 	
-	public Map<String, Object> insertStoreInfo(Map<String, Object> param) {
+	public ApiResult<Object> insertStoreInfo(StoreDto storeDto) {
 		
-		int count = storeMapper.getStoreCount(param);
+		int count = storeMapper.getStoreCount(storeDto);
 		if(count != 0) {
 			// 이미 등록된 가게가 존재
-			return ResponseUtil.error(ResponseCode.FAIL);
+			return ApiResult.success("400", "실패", null);
 		}
 		
-		int result = storeMapper.insertStoreInfo(param);
+		int result = storeMapper.insertStoreInfo(storeDto);
 		if(result == 1) {
-			return ResponseUtil.success();
+			return ApiResult.success("200", "성공", null);
 		} else {
-			return ResponseUtil.error(ResponseCode.FAIL);
+			return ApiResult.success("400", "실패", null);
 		}
 	}
 	
 	
-	public Map<String, Object> updateStoreInfo(Map<String, Object> param) {
-		int count = storeMapper.getStoreCount(param);
+	public ApiResult<Object> updateStoreInfo(StoreDto storeDto) {
+		int count = storeMapper.getStoreCount(storeDto);
 		if(count == 0) {
 			// 등록된 가게가 없음
-			return ResponseUtil.error(ResponseCode.FAIL);
+			return ApiResult.success("400", "실패", null);
 		}
 		
-		int result = storeMapper.updateStoreInfo(param);
+		int result = storeMapper.updateStoreInfo(storeDto);
 		if(result == 1) {
-			return ResponseUtil.success();
+			return ApiResult.success("200", "성공", null);
 		} else {
-			return ResponseUtil.error(ResponseCode.FAIL);
+			return ApiResult.success("400", "실패", null);
 		}
 	}
 }

@@ -1,7 +1,7 @@
 // PersonaController.java
 package com.bside.redaeri.persona;
 
-import java.util.Map;
+import java.io.IOException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,6 +12,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bside.redaeri.login.LoginIdx;
+import com.bside.redaeri.util.ApiResult;
+
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -22,25 +25,28 @@ public class PersonaController {
 	
 	/**
 	 * 말투 분석 후 정보 저장
-	 * @param param
+	 * @param AnalyzeDto
 	 * @return
+	 * @throws IOException 
 	 */
+	@SecurityRequirement(name = "token")
 	@PostMapping("/persona/analyze")
-	public Map<String, Object> personaAnalyze(@RequestBody Map<String, Object> param) {
+	public ApiResult<Object> personaAnalyze(@RequestBody AnalyzeDto analyzeDto, @LoginIdx Integer loginIdx) throws IOException {
 		
-		return personaService.personaAnalyze(param);
+		return personaService.personaAnalyze(analyzeDto, loginIdx);
 	}
 	
 	/**
 	 * 말투 직접 선택해서 저장
-	 * @param param
+	 * @param PersonaDto
 	 * @return
 	 */
+	@SecurityRequirement(name = "token")
 	@PostMapping("/persona/insert")
-	public Map<String, Object> personaInsert(@RequestBody Map<String, Object> param) {
+	public ApiResult<Object> personaInsert(@RequestBody PersonaDto personaDto) {
 		
 		
-		return personaService.insertPersonaInfo(param);
+		return personaService.insertPersonaInfo(personaDto);
 	}
 	
 	/**
@@ -48,10 +54,11 @@ public class PersonaController {
 	 * @param param
 	 * @return
 	 */
+	@SecurityRequirement(name = "token")
 	@PatchMapping("/persona/update")
-	public Map<String, Object> personaUpdate(@RequestBody Map<String, Object> param) {
+	public ApiResult<Object> personaUpdate(@RequestBody PersonaDto personaDto) {
 		
-		return personaService.updatePersonaInfo(param);
+		return personaService.updatePersonaInfo(personaDto);
 	}
 	
 	/**
@@ -59,10 +66,11 @@ public class PersonaController {
 	 * @param param
 	 * @return
 	 */
+	@SecurityRequirement(name = "token")
 	@PatchMapping("/persona/answer/update")
-	public Map<String, Object> personaAnswerUpdate(@RequestBody Map<String, Object> param) {
+	public ApiResult<Object> personaAnswerUpdate(@RequestBody PersonaDto personaDto) {
 		
-		return personaService.updatePersonaAnswer(param);
+		return personaService.updatePersonaAnswer(personaDto);
 	}
 	
 	/**
@@ -70,8 +78,9 @@ public class PersonaController {
 	 * @param loginIdx
 	 * @return
 	 */
+	@SecurityRequirement(name = "token")
 	@GetMapping("/persona/get")
-	public Map<String, Object> personaGet(@LoginIdx Integer loginIdx) {
+	public ApiResult<Object> personaGet(@LoginIdx Integer loginIdx) {
 		
 		return personaService.getPersonaInfo(loginIdx);
 	}
