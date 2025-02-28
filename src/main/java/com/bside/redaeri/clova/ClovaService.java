@@ -28,31 +28,24 @@ public class ClovaService {
 	private String REQUEST_ID;
 	
 	@Value("${clova.ocr.url}")
-	private static String API_URL;
+	private String API_URL;
 	
 	@Value("${clova.ocr.key}")
-	private static String API_OCR_KEY = "";
+	private String API_OCR_KEY;
 	
 	//clova studio
 	
 	/**
 	 * TPA : TextPattenAnalyze (리뷰 분석 프롬프트)
 	 * AG : AnswerGenerate (답변 생성 프롬프트)
+	 * GA : 말투 직접 선택 시 (만능 답변만 생성 프롬프트)
 	 * @param text
 	 * @param type
 	 * @return 
 	 */
-	public String generateChatResponse(String text, String type) {
+	public String generateChatResponse(String prompt) {
         String urlString = "https://clovastudio.stream.ntruss.com/testapp/v1/chat-completions/HCX-DASH-001";
        
-        String prompt = "";
-        if(type.equals("TPA")) {
-        	prompt = ClovaPromptTemplates.TEXT_PATTHENANALYZE_PROMPT(text);
-        } else if(type.equals("AG")) {
-        	prompt = "";
-        }
-        // todo 프롬프트 선택할 수 있도록
-        
         System.out.println(prompt);
     	StringBuilder sb = new StringBuilder();
 
@@ -138,6 +131,7 @@ public class ClovaService {
                 + "\"data\": \"" + imgInfo.get("data") + "\" }]}";
 
         HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
+        
         ResponseEntity<String> response = restTemplate.exchange(API_URL, HttpMethod.POST, entity, String.class);
 
         StringBuilder result = new StringBuilder();

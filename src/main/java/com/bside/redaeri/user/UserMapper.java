@@ -13,7 +13,7 @@ public interface UserMapper {
 	
 	@Insert("INSERT INTO user(user_id) VALUES(#{userId})")
 	@Options(useGeneratedKeys = true, keyProperty = "idx", keyColumn = "idx")
-	public int insertUser(UserDto userdto);
+	public int insertUser(UserDto userDto);
 
 	@Select("SELECT " +
 	        "u.idx AS userIdx, " +
@@ -34,6 +34,8 @@ public interface UserMapper {
 	public int countUserAnswer(Integer loginIdx);
 	
 	
+	@Select("SELECT idx as userIdx FROM user WHERE user_id = #{accessToken}")
+	public Integer existUser(String accessToken);
 	
 	public int deleteUser(Integer loginIdx);
 }

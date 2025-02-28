@@ -21,7 +21,7 @@ public class PersonaDto {
     @Schema(description = "페르소나 이미지 종류", example = "1")
     private int personaImgType;
 
-    @Schema(description = "이모티콘 사용 스타일", example = "다다익선! 많은 이모티콘")
+    @Schema(description = "감정", example = "고객님께 감사해요")
     private String emotionSelect;
 
     @Schema(description = "답변 길이 스타일", example = "정성이 담긴 장문")

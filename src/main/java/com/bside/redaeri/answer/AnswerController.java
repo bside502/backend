@@ -1,9 +1,9 @@
 package com.bside.redaeri.answer;
 
 import java.io.IOException;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,13 +33,12 @@ public class AnswerController {
 	@SecurityRequirement(name = "token")
 	@PostMapping("/answer/generate")
 	public ApiResult<Object> answerGenerate(@LoginIdx Integer loginIdx, @RequestBody AnswerDto answerDto) {
-		answerDto.setLogIdx(loginIdx);
 		
-		return answerService.generateAnswer(answerDto);
+		return answerService.generateAnswer(loginIdx, answerDto);
 	}
 	
 	@SecurityRequirement(name = "token")
-	@PostMapping("/answer/log/get")
+	@GetMapping("/answer/log/get")
 	public ApiResult<Object> answerLogGet(@LoginIdx Integer loginIdx) {
 		
 		return answerService.getAnswerLog(loginIdx);

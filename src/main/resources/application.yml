@@ -3,7 +3,13 @@ spring:
     name: redaeri
   profiles:
     active: dev
-
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 3MB
+      max-request-size: 3MB
+   
+    
 server:
   port: 8080
 
@@ -32,8 +38,10 @@ naver:
 
 logging:
   level:
-    root: INFO
+    root: DEBUG
     org.apache.ibatis: DEBUG  # MyBatis SQL 실행 로그
+
+
 
 ---
 

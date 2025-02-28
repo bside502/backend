@@ -13,7 +13,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.bside.redaeri.clova.ClovaPromptTemplates;
 import com.bside.redaeri.clova.ClovaService;
+import com.bside.redaeri.store.StoreMapper;
 import com.bside.redaeri.util.ApiResult;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -26,6 +28,9 @@ public class PersonaService {
 	
 	@Autowired
 	private PersonaMapper personaMapper;
+	
+	@Autowired
+	private StoreMapper storeMapper;
 	
 	/**
 	 * 말투 분석 후 정보 저장
@@ -68,7 +73,8 @@ public class PersonaService {
 			sb.append("[리뷰 내용]\n").append(analyzeDto.getUploadTextThird());
 		}
 		
-		String analyze = clovaService.generateChatResponse(sb.toString(), "TPA");
+		String prompt = ClovaPromptTemplates.TEXT_PATTHEN_ANALYZE_PROMPT(sb.toString());
+		String analyze = clovaService.generateChatResponse(prompt);
 		
 		//1. 클로바에 말투 분석 요청
 		//2. 답변을 받고 
@@ -123,13 +129,19 @@ public class PersonaService {
 	 * @param param
 	 * @return
 	 */
-	public ApiResult<Object> insertPersonaInfo(PersonaDto personaDto) {
+	public ApiResult<Object> insertPersonaInfo(Integer loginIdx, PersonaDto personaDto) {
 		
 		// todo clova 만능답변 만들어줘
+		String prompt = ClovaPromptTemplates.GENERATE_ALL_ANSWER_PROMPT(personaDto);
+		String answer = clovaService.generateChatResponse(prompt);
 		
+		int storeIdx = personaMapper.getStoreIdx(loginIdx);
+		
+		personaDto.setStoreIdx(storeIdx);
+		personaDto.setAllAnswer(answer);
 		int result = personaMapper.insertPersonaInfo(personaDto);
 		if(result != 0) {
-			return ApiResult.success("200", "성공", null);
+			return ApiResult.success("200", "성공", personaDto);
 		} else {
 			return ApiResult.success("400", "실패", null);
 		}
@@ -142,9 +154,14 @@ public class PersonaService {
 	 */
 	public ApiResult<Object> updatePersonaInfo(PersonaDto personaDto) {
 		
+		String prompt = ClovaPromptTemplates.GENERATE_ALL_ANSWER_PROMPT(personaDto);
+		String answer = clovaService.generateChatResponse(prompt);
+		
+		personaDto.setAllAnswer(answer);
+		
 		int result = personaMapper.updatePersonaInfo(personaDto);
 		if(result != 0) {
-			return ApiResult.success("200", "성공", null);
+			return ApiResult.success("200", "성공", personaDto);
 		} else {
 			return ApiResult.success("400", "실패", null);
 		}

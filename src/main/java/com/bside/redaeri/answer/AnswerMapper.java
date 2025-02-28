@@ -16,7 +16,7 @@ public interface AnswerMapper {
 	        + "#{loginIdx}, #{storeIdx}, #{personaIdx}, #{content}, #{result}, #{reviewScore}, #{includeText}, #{reviewType})")
 	public int insertAnswerGenerateLog(AnswerDto answerDto);
 	
-	@Select("SELECT idx as answerGenerateLogIdx FROM answer_generate_log"
+	@Select("SELECT idx as answerGenerateLogIdx FROM answer_generate_log "
 			+ "WHERE user_idx = #{loginIdx} ORDER BY insert_date LIMIT 20")
 	public List<Map<String, Object>> getAnswerGenerateLogList(Integer loginIdx);
 }

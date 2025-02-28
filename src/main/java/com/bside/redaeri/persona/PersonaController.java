@@ -2,14 +2,18 @@
 package com.bside.redaeri.persona;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.bside.redaeri.login.LoginIdx;
 import com.bside.redaeri.util.ApiResult;
@@ -30,8 +34,11 @@ public class PersonaController {
 	 * @throws IOException 
 	 */
 	@SecurityRequirement(name = "token")
-	@PostMapping("/persona/analyze")
-	public ApiResult<Object> personaAnalyze(@RequestBody AnalyzeDto analyzeDto, @LoginIdx Integer loginIdx) throws IOException {
+	@PostMapping(value = "/persona/analyze")
+	public ApiResult<Object> personaAnalyze(
+			@RequestParam("reviewImgFiles") List<MultipartFile> reviewImgFiles,
+			@RequestParam AnalyzeDto analyzeDto,
+			@LoginIdx Integer loginIdx) throws IOException {
 		
 		return personaService.personaAnalyze(analyzeDto, loginIdx);
 	}
@@ -43,10 +50,9 @@ public class PersonaController {
 	 */
 	@SecurityRequirement(name = "token")
 	@PostMapping("/persona/insert")
-	public ApiResult<Object> personaInsert(@RequestBody PersonaDto personaDto) {
+	public ApiResult<Object> personaInsert(@LoginIdx Integer loginIdx, @RequestBody PersonaDto personaDto) {
 		
-		
-		return personaService.insertPersonaInfo(personaDto);
+		return personaService.insertPersonaInfo(loginIdx, personaDto);
 	}
 	
 	/**

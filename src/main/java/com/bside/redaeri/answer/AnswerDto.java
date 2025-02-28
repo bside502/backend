@@ -14,6 +14,9 @@ public class AnswerDto {
 
     @Schema(description = "별점 1 ~ 5", example = "5")
     private int score;
+    
+    @Schema(description = "꼭 넣고싶은 내용", example = "감사합니다!!")
+    private String includeText;
 
     @Schema(description = "생성된 답변", example = "이 제품 정말 마음에 들어요!")
     private String generateAnswer;

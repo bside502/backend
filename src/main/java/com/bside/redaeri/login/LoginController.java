@@ -5,8 +5,10 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.Map;
 
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,7 +17,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bside.redaeri.filter.JWTService;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.bside.redaeri.user.UserDto;
+import com.bside.redaeri.user.UserMapper;
+import com.bside.redaeri.util.ApiResult;
 
 @RestController
 @RequestMapping("/api/v1/")
@@ -31,30 +35,35 @@ public class LoginController {
 	private static String NAVER_CLIENT_SECRET;
 
 	private static String NAVER_TOKEN_URL = "https://nid.naver.com/oauth2.0/token";
-	private static String NAVER_USER_INFO_URL = "https://openapi.naver.com/v1/nid/me";
 	
-	private static String NAVER_CALLBACK_URL = "http://localhost:5671/login-callback";
+	//private static String NAVER_USER_INFO_URL = "https://openapi.naver.com/v1/nid/me";
+	//private static String NAVER_CALLBACK_URL = "http://localhost:5671/login-callback";
+	
+	@Autowired
+	private UserMapper userMapper;
 	
 	@PostMapping("/naver/callback")
-	public void naverCallback(@RequestBody Map<String, Object> param) throws IOException {
-		try {
-			String code = (String) param.get("code");
-			String state = (String) param.get("state");
-
-			if (code == null || state == null) {
-				throw new Exception();
-			}
-
-			String accessToken = getAccessToken(code, state);
-
-			Map<String, Object> userInfo = getUserProfile(accessToken);
-			// todo 이미 등록된 회원인지 확인
-			
-			String jwtToken = jwtService.generateToken(userInfo);
-
-		} catch (Exception e) {
-			e.printStackTrace();
+	public ApiResult<Object> naverCallback(@RequestBody LoginDto loginDto) throws Exception {
+		String accessToken = getAccessToken(loginDto.getCode(), loginDto.getStatus());
+		if(accessToken == null) {
+			return ApiResult.success("1001", "accessToken 발급 실패", null);
 		}
+		
+		
+		Map<String, Object> userInfo = new HashMap<>();
+		Integer userIdx = userMapper.existUser(accessToken);
+		if(userIdx == null) { //회원 x
+			UserDto userDto = new UserDto();
+			userDto.setUserId(accessToken);
+			int idx = userMapper.insertUser(userDto);
+			userInfo.put("loginIdx", idx);
+		} else { // 회원 o
+			userInfo.put("loginIdx", userIdx);
+		}
+		String jwtToken = jwtService.generateToken(userInfo);
+		userInfo.put("token", jwtToken);
+		
+		return ApiResult.success("200", "성공", userInfo);
 	}
 
 	private String getAccessToken(String code, String state) throws IOException {
@@ -66,7 +75,6 @@ public class LoginController {
 				+ "&state=" + state;
 
 		try {
-
 			URL url = new URL(requestURL);
 			HttpURLConnection con = (HttpURLConnection) url.openConnection();
 			con.setRequestMethod("GET");
@@ -87,15 +95,17 @@ public class LoginController {
 			}
 			br.close();
 			System.out.println("accessToken ==> " + response.toString());
-			String accessToken = response.toString().split("\"access_token\":\"")[1].split("\"")[0];
-			
-			return accessToken;
+			// JSON 파싱하여 access_token만 추출
+            JSONObject jsonResponse = new JSONObject(response.toString());
+
+            return jsonResponse.getString("access_token");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return null;
 	}
-
+	
+	/*
 	private Map<String, Object> getUserProfile(String accessToken) {
 		try {
 			URL url = new URL(NAVER_USER_INFO_URL);
@@ -121,4 +131,5 @@ public class LoginController {
 		}
 		return null;
 	}
+	*/
 }

@@ -12,7 +12,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.bside.redaeri.clova.ClovaPromptTemplates;
 import com.bside.redaeri.clova.ClovaService;
+import com.bside.redaeri.persona.PersonaDto;
+import com.bside.redaeri.persona.PersonaMapper;
 import com.bside.redaeri.util.ApiResult;
 
 @Service
@@ -23,6 +26,9 @@ public class AnswerService {
 	
 	@Autowired
 	private AnswerMapper answerMapper;
+	
+	@Autowired
+	private PersonaMapper personaMapper;
 	
 	public ApiResult<Object> readImageToText(MultipartFile mFile) throws IOException {
 		
@@ -49,10 +55,15 @@ public class AnswerService {
 		return ApiResult.success("200", "성공", result);
 	}
 	
-	public ApiResult<Object> generateAnswer(AnswerDto answerDto) {
+	public ApiResult<Object> generateAnswer(Integer loginIdx, AnswerDto answerDto) {
 		
 		// answerDTO 값 넘겨주기
-		String answer = clovaService.generateChatResponse("test", "AG");
+		int storeIdx = personaMapper.getStoreIdx(loginIdx);
+		Map<String, Object> personaInfo = personaMapper.getPersonaInfo(storeIdx);
+		
+		String prompt = ClovaPromptTemplates.ANSWER_GENERATE(answerDto, personaInfo);
+		String answer = clovaService.generateChatResponse(prompt);
+		System.out.println("answer --> " + answer);
 		/**
 		 * 1. clova 에 요청
 		 * 2. 답변 받고 DB 저장 후 return
@@ -61,7 +72,7 @@ public class AnswerService {
 		answerDto.setReviewType(answer);
 		answerDto.setGenerateAnswer(answer);
 		
-		int cnt = answerMapper.insertAnswerGenerateLog(answerDto);
+		//int cnt = answerMapper.insertAnswerGenerateLog(answerDto);
 		
 		
 		return ApiResult.success("200", "성공", null);

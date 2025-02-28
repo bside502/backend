@@ -23,7 +23,7 @@ public interface PersonaMapper {
 	@Select("SELECT persona_select as personaSelect, emotion_select as emotionSelect, "
 			+ "length_select as lengthSelect, store_idx as storeIdx, all_answer as allAnswer "
 			+ "FROM persona WHERE idx = #{storeIdx}")
-	public Map<String, Object> getPersonaInfo(int loginIdx);
+	public Map<String, Object> getPersonaInfo(int storeIdx);
 	
 	// 말투 직접 선택해서 저장
 	@Insert("INSERT INTO persona ("
@@ -34,8 +34,9 @@ public interface PersonaMapper {
 	public int insertPersonaInfo(PersonaDto personaDto);
 	
 	// 말투 직접 수정해서 저장
-	@Update("UPDATE persona"
-			+ "SET persona_select = #{personaSelect}, emotion_select = #{emotionSelect},"
-			+ "length_select = #{lengthSelect}, all_answer = #{allAnswer}")
+	@Update("UPDATE persona "
+			+ "SET persona_select = #{personaSelect}, emotion_select = #{emotionSelect}, "
+			+ "length_select = #{lengthSelect}, all_answer = #{allAnswer} "
+			+ "WHERE idx = #{idx}")
 	public int updatePersonaInfo(PersonaDto personaDto);
 }
