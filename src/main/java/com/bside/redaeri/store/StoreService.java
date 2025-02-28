@@ -16,7 +16,7 @@ public class StoreService {
 		int count = storeMapper.getStoreCount(storeDto);
 		if(count != 0) {
 			// 이미 등록된 가게가 존재
-			return ApiResult.success("400", "실패", null);
+			return ApiResult.success("2001", "이미 하나의 가게를 등록했습니다.", null);
 		}
 		
 		int result = storeMapper.insertStoreInfo(storeDto);
@@ -32,7 +32,7 @@ public class StoreService {
 		int count = storeMapper.getStoreCount(storeDto);
 		if(count == 0) {
 			// 등록된 가게가 없음
-			return ApiResult.success("400", "실패", null);
+			return ApiResult.success("2002", "수정할 가게 정보가 없습니다.", null);
 		}
 		
 		int result = storeMapper.updateStoreInfo(storeDto);
