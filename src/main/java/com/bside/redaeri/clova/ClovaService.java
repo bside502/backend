@@ -36,9 +36,6 @@ public class ClovaService {
 	//clova studio
 	
 	/**
-	 * TPA : TextPattenAnalyze (리뷰 분석 프롬프트)
-	 * AG : AnswerGenerate (답변 생성 프롬프트)
-	 * GA : 말투 직접 선택 시 (만능 답변만 생성 프롬프트)
 	 * @param text
 	 * @param type
 	 * @return 
@@ -46,7 +43,6 @@ public class ClovaService {
 	public String generateChatResponse(String prompt) {
         String urlString = "https://clovastudio.stream.ntruss.com/testapp/v1/chat-completions/HCX-DASH-001";
        
-        System.out.println(prompt);
     	StringBuilder sb = new StringBuilder();
 
         try {
@@ -68,8 +64,6 @@ public class ClovaService {
 
             // 응답 코드 확인
             int responseCode = conn.getResponseCode();
-            System.out.println("Response Code: " + responseCode);
-            
 
             // 응답 본문 출력
             if (responseCode == HttpURLConnection.HTTP_OK) {
@@ -81,6 +75,7 @@ public class ClovaService {
                             try {
                                 // "data:" 접두사 제거
                                 String jsonStr = line.substring(5);
+
                                 
                                 // 빈 라인 건너뛰기
                                 if (jsonStr.trim().isEmpty()) {
@@ -91,11 +86,10 @@ public class ClovaService {
                                 ObjectMapper objectMapper = new ObjectMapper();
                                 JsonNode rootNode = objectMapper.readTree(jsonStr);
                                 
-                                // content 값 추출 및 추가
-                                String content = rootNode.path("message").path("content").asText();
-                                sb.append(content);
+                                int outputLength = rootNode.path("outputLength").asInt();
+                            	String content = rootNode.path("message").path("content").asText();
                                 
-                                // 처리 로그 (선택적)
+                                sb.append(content);
                             } catch (Exception e) {
                                 System.err.println("JSON 파싱 오류: " + e.getMessage());
                             }
@@ -109,7 +103,7 @@ public class ClovaService {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return sb.toString();
+        return sb.toString().substring(0, sb.toString().length() / 2);
     }
 	
 	// clova ocr

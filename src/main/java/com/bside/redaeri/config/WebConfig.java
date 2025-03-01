@@ -28,10 +28,10 @@ public class WebConfig implements WebMvcConfigurer {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/**")
-                        .allowedOrigins("*")  // 필요한 도메인만 허용 (예: "https://example.com")
-                        .allowedMethods("GET", "POST", "PATCH", "DELETE")
-                        .allowedHeaders("*");
+            	registry.addMapping("/**")
+                	.allowedOrigins("*") // 필요하면 특정 도메인으로 제한
+                	.allowedMethods("GET", "POST", "PATCH", "DELETE")
+                	.allowedHeaders("*");
             }
         };
     }

@@ -4,13 +4,17 @@ import java.io.IOException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 
+@Component
+@Slf4j
 public class JWTFilter extends OncePerRequestFilter {
 	@Value("${jwt.secret.key}")
 	private String SECRET_KEY;
@@ -46,12 +50,12 @@ public class JWTFilter extends OncePerRequestFilter {
 			}
 		}
 		
-		
 		if(isExclude) {
 			filterChain.doFilter(request, response);
 			return;
 		}
 		
+		log.info("request Url => " + requestURI);
 		String token = request.getHeader("token");
 		try {
 			int userIdx = jwtService.getUserIdx(token);

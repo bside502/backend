@@ -15,6 +15,8 @@ public enum ResponseCode {
 	// fail
 	FAIL("400", HttpStatus.BAD_REQUEST, "FAIL"),
 	
+	
+	
 	// 99
 	EXPIRE_TOKEN("99", HttpStatus.UNAUTHORIZED, "EXPIRE_TOKEN"),
 	;

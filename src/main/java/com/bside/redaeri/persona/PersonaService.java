@@ -9,12 +9,13 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.bside.redaeri.clova.ClovaPromptTemplates;
 import com.bside.redaeri.clova.ClovaService;
+import com.bside.redaeri.store.StoreDto;
 import com.bside.redaeri.store.StoreMapper;
 import com.bside.redaeri.util.ApiResult;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -39,9 +40,22 @@ public class PersonaService {
 	 * @throws IOException 
 	 */
 	public ApiResult<Object> personaAnalyze(AnalyzeDto analyzeDto, Integer loginIdx) throws IOException {
-		
 		StringBuilder sb = new StringBuilder();
-		System.out.println(analyzeDto.getUploadFileList() + " : " + analyzeDto.getUploadFileList() == null);
+		sb.append("답변 : \n");
+		
+
+		// insert 불가능하도록
+		int cnt = personaMapper.existPersona(loginIdx);
+		if(cnt >= 1) {
+			return ApiResult.error("5000", "이미 생성한 페르소나가 존재합니다.");
+		}
+		
+		PersonaDto personaDto = new PersonaDto();
+		if(analyzeDto.getPersonaIdx() == 0) {
+			// 본인 페르소나만 수정할 수 있도록todo
+			personaDto.setPersonaIdx(analyzeDto.getPersonaIdx());
+		}
+		
 		if(analyzeDto.getUploadFileList() != null) {
 			for(MultipartFile mFile : analyzeDto.getUploadFileList()) {
 				String name = mFile.getOriginalFilename();
@@ -56,71 +70,90 @@ public class PersonaService {
 				imgInfo.put("data", Base64.getEncoder().encodeToString(mFile.getBytes()));
 			
 				String answer = clovaService.imageTextExtract(imgInfo);
-				sb.append("[리뷰 내용]\n").append(answer);
+				sb.append(answer);
+				sb.append("\n\n");
 			}
-			sb.append("\n\n");
 		}
 		
 		if(analyzeDto.getUploadTextFirst() != null) {
-			sb.append("[리뷰 내용]\n").append(analyzeDto.getUploadTextFirst());
+			sb.append(analyzeDto.getUploadTextFirst());
 			sb.append("\n\n");
 		}
 		if(analyzeDto.getUploadTextSecond() != null) {
-			sb.append("[리뷰 내용]\n").append(analyzeDto.getUploadTextSecond());
+			sb.append(analyzeDto.getUploadTextSecond());
 			sb.append("\n\n");
 		}
 		if(analyzeDto.getUploadTextThird() != null) {
-			sb.append("[리뷰 내용]\n").append(analyzeDto.getUploadTextThird());
+			sb.append(analyzeDto.getUploadTextThird());
 		}
 		
-		String prompt = ClovaPromptTemplates.TEXT_PATTHEN_ANALYZE_PROMPT(sb.toString());
-		String analyze = clovaService.generateChatResponse(prompt);
 		
-		//1. 클로바에 말투 분석 요청
-		//2. 답변을 받고 
-		//3. 형식에 맞게 전달.
-		System.out.println("analyze --> " + analyze);
-        ObjectMapper objectMapper = new ObjectMapper();
-        JsonNode rootNode = objectMapper.readTree(analyze);
+		String prompt = ClovaPromptTemplates.ANSWER_GENERATE("personaAnalyze/personaSelect.json", sb.toString());
+		String answer = clovaService.generateChatResponse(prompt);
+		personaDto.setPersonaSelect(answer);
+		System.out.println("answer --> " + answer);
+
+		prompt = ClovaPromptTemplates.ANSWER_GENERATE("personaAnalyze/lengthSelect.json", sb.toString());
+		answer = clovaService.generateChatResponse(prompt);
+		personaDto.setLengthSelect(answer);
+		System.out.println("answer --> " + answer);
+
+		prompt = ClovaPromptTemplates.ANSWER_GENERATE("personaAnalyze/emotionSelect.json", sb.toString());
+		answer = clovaService.generateChatResponse(prompt);
+		personaDto.setEmotionSelect(answer);
+		System.out.println("answer --> " + answer);
         
-        String persona = rootNode.path("persona").asText();
-        String emotion = rootNode.path("emotion").asText();
-        String length = rootNode.path("length").asText();
-        String answer = rootNode.path("answer").asText();
-            
-        
-        PersonaDto personaDto = new PersonaDto();
-        personaDto.setPersonaSelect(persona);
-        personaDto.setEmotionSelect(emotion);
-        personaDto.setLengthSelect(length);
-        personaDto.setAllAnswer(answer);
-        
-        int type = 0;
+        int type = 5;
+        String persona = personaDto.getPersonaSelect();
+		String promptPath = "answerGenerate/";
         if(persona.contains("알바생")) {
-        	type = 1;
-        } else if(persona.contains("청년")) {
-        	type = 2;
-        } else if(persona.contains("초보")) {
-        	type = 3;
-        } else if(persona.contains("유쾌한")) {
-        	type = 4;
-        } else if(persona.contains("최선")) {
-        	type = 5;
-        }
+			type = 1;
+			promptPath += "generateAnswer1.json";
+		} else if(persona.contains("나이스")) {
+			type = 2;                   
+			promptPath += "generateAnswer2.json";
+
+		} else if(persona.contains("유쾌한")) {
+			type = 3;
+			promptPath += "generateAnswer3.json";
+
+		} else if(persona.contains("묵묵히")) {
+			type = 4;
+			promptPath += "generateAnswer4.json";
+		} else {
+			type = 5;
+			promptPath += "generateAnswer5.json";
+		}
         personaDto.setPersonaImgType(type);
         
+        StoreDto storeDto = storeMapper.getStoreInfo(loginIdx);
+        String content = "가게 이름 :" + storeDto.getStoreName() + ", 가게 종류 : " + storeDto.getStoreType() + " \n" +
+        		personaDto.getEmotionSelect() + "하는 내용으로, 문장 길이는 " + personaDto.getLengthSelect() + "으로 만능답변을 생성하세요";
+        
+        System.out.println("cotent -- >" + content);
+    	prompt = ClovaPromptTemplates.ANSWER_GENERATE(promptPath, content);
+		answer = clovaService.generateChatResponse(prompt);
+		
+		System.out.println(answer);
+		personaDto.setAllAnswer(answer);
+		
+        
+        // 만능 답변 생성
         
         // 임시, storeIdx
         int storeIdx = personaMapper.getStoreIdx(loginIdx);
-        
         personaDto.setStoreIdx(storeIdx);
         
+        // 기존 persona가 있으면 수정
+        System.out.println("analyzeDto --> " + analyzeDto.getPersonaIdx());
+        if(analyzeDto.getPersonaIdx() == 0) {
+        	personaMapper.insertPersonaInfo(personaDto);
+        } else {
+        	personaDto.setPersonaIdx(analyzeDto.getPersonaIdx());
+        	personaMapper.updatePersonaInfo(personaDto);
+        }
         
-        personaMapper.insertPersonaInfo(personaDto);
-        
-		Map<String, Object> result = new HashMap<>();
-		result.put("result", analyze);
-		return ApiResult.success("200", "성공", result);
+		return ApiResult.success("200", "성공", personaDto);
 	}
 	
 	
@@ -131,8 +164,20 @@ public class PersonaService {
 	 */
 	public ApiResult<Object> insertPersonaInfo(Integer loginIdx, PersonaDto personaDto) {
 		
+		int storeCnt = personaMapper.getStoreCount(loginIdx);
+		if(storeCnt == 0) {
+			return ApiResult.error("4001", "가게 정보를 먼저 입력해주세요.");
+		}
+		
+		int personaCnt = personaMapper.existPersona(loginIdx);
+		if(personaCnt >= 1) {
+			return ApiResult.error("4001", "이미 페르소나 정보가 존재합니다.");
+		}
+		
 		// todo clova 만능답변 만들어줘
-		String prompt = ClovaPromptTemplates.GENERATE_ALL_ANSWER_PROMPT(personaDto);
+		StoreDto storeDto = storeMapper.getStoreInfo(loginIdx);
+		
+		String prompt = ClovaPromptTemplates.GENERATE_ALL_ANSWER_PROMPT(personaDto, storeDto);
 		String answer = clovaService.generateChatResponse(prompt);
 		
 		int storeIdx = personaMapper.getStoreIdx(loginIdx);
@@ -152,9 +197,21 @@ public class PersonaService {
 	 * @param param
 	 * @return
 	 */
-	public ApiResult<Object> updatePersonaInfo(PersonaDto personaDto) {
+	public ApiResult<Object> updatePersonaInfo(Integer loginIdx, PersonaDto personaDto) {
+
+		int storeCnt = personaMapper.getStoreCount(loginIdx);
+		if(storeCnt == 0) {
+			return ApiResult.error("4001", "가게 정보를 먼저 입력해주세요.");
+		}
 		
-		String prompt = ClovaPromptTemplates.GENERATE_ALL_ANSWER_PROMPT(personaDto);
+		int personaCnt = personaMapper.existPersona(loginIdx);
+		if(personaCnt == 0) {
+			return ApiResult.error("4001", "페르소나 정보를 먼저 입력해주세요.");
+		}
+		
+		StoreDto storeDto = storeMapper.getStoreInfo(loginIdx);
+		
+		String prompt = ClovaPromptTemplates.GENERATE_ALL_ANSWER_PROMPT(personaDto, storeDto);
 		String answer = clovaService.generateChatResponse(prompt);
 		
 		personaDto.setAllAnswer(answer);
@@ -174,9 +231,15 @@ public class PersonaService {
 	 * @return
 	 */
 	public ApiResult<Object> updatePersonaAnswer(PersonaDto personaDto) {
+		// 존재하는 페르소나 인지 확인
+		// todo 본인의 페르소나만 수정 가능하도록
+		int cnt = personaMapper.existPersonaInfo(personaDto);
+		if(cnt == 0) {
+			return ApiResult.success("3001", "존재하지 않는 페르소나 정보입니다.", null);
+		}
 		int result = personaMapper.updatePersonaAnswer(personaDto);
 		if(result == 1) {
-			return ApiResult.success("200", "성공", null);
+			return ApiResult.success("200", "성공", result);
 		} else {
 			return ApiResult.success("400", "실패", null);
 		}
@@ -189,13 +252,12 @@ public class PersonaService {
 	 */
 	public ApiResult<Object> getPersonaInfo(int loginIdx) {
 		int storeIdx = personaMapper.getStoreIdx(loginIdx);
-		
 		Map<String, Object> result = personaMapper.getPersonaInfo(storeIdx);
 		
 		if(result != null) {
 			return ApiResult.success("200", "성공", result);
 		} else {
-			return ApiResult.success("400", "실패", null);
+			return ApiResult.success("400", "페르소나 정보를 등록해주세요", null);
 		}
 	}
 }

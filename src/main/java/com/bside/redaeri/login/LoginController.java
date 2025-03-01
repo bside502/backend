@@ -29,10 +29,10 @@ public class LoginController {
 	private JWTService jwtService;
 	
 	@Value("${naver.client.id}")
-	private static String NAVER_CLIENT_ID;
+	private String NAVER_CLIENT_ID;
 	
 	@Value("${naver.client.key}")
-	private static String NAVER_CLIENT_SECRET;
+	private String NAVER_CLIENT_SECRET;
 
 	private static String NAVER_TOKEN_URL = "https://nid.naver.com/oauth2.0/token";
 	
@@ -44,11 +44,14 @@ public class LoginController {
 	
 	@PostMapping("/naver/callback")
 	public ApiResult<Object> naverCallback(@RequestBody LoginDto loginDto) throws Exception {
-		String accessToken = getAccessToken(loginDto.getCode(), loginDto.getStatus());
-		if(accessToken == null) {
-			return ApiResult.success("1001", "accessToken 발급 실패", null);
-		}
+		System.out.println("code--> " + loginDto.getCode() + " : state --> " + loginDto.getState());
+		String accessToken = getAccessToken(loginDto.getCode(), loginDto.getState());
+		System.out.println("accessToken --> " + accessToken);
 		
+		
+		if(accessToken == null) {
+			return ApiResult.success("1001","accessToken 발급 실패", null);
+		}
 		
 		Map<String, Object> userInfo = new HashMap<>();
 		Integer userIdx = userMapper.existUser(accessToken);
@@ -56,7 +59,11 @@ public class LoginController {
 			UserDto userDto = new UserDto();
 			userDto.setUserId(accessToken);
 			int idx = userMapper.insertUser(userDto);
-			userInfo.put("loginIdx", idx);
+			if(idx == 1) {
+				userInfo.put("loginIdx", userDto.getIdx());
+			} else {
+				return ApiResult.success("1002", "회원 가입 실패", null);
+			}
 		} else { // 회원 o
 			userInfo.put("loginIdx", userIdx);
 		}
@@ -94,7 +101,7 @@ public class LoginController {
 				response.append(inputLine);
 			}
 			br.close();
-			System.out.println("accessToken ==> " + response.toString());
+			System.out.println("result ==> " + response.toString());
 			// JSON 파싱하여 access_token만 추출
             JSONObject jsonResponse = new JSONObject(response.toString());
 

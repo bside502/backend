@@ -23,6 +23,12 @@ public class AnswerController {
 	@Autowired
 	private AnswerService answerService;
 	
+	/**
+	 * clova ocr 이미지 텍스트 읽기
+	 * @param mFile
+	 * @return
+	 * @throws IOException
+	 */
 	@SecurityRequirement(name = "token")
 	@PostMapping("/image/text/read")
 	public ApiResult<Object> imageTextReader(@RequestParam("reviewImgFile") MultipartFile mFile) throws IOException {
@@ -30,17 +36,46 @@ public class AnswerController {
 		return answerService.readImageToText(mFile);
 	}
 	
+	/**
+	 * 답변 생성하기
+	 * @param loginIdx
+	 * @param answerDto
+	 * @return
+	 * @throws IOException 
+	 * @throws io.jsonwebtoken.io.IOException 
+	 */
 	@SecurityRequirement(name = "token")
 	@PostMapping("/answer/generate")
-	public ApiResult<Object> answerGenerate(@LoginIdx Integer loginIdx, @RequestBody AnswerDto answerDto) {
+	public ApiResult<Object> answerGenerate(@LoginIdx Integer loginIdx, @RequestBody AnswerDto answerDto) throws io.jsonwebtoken.io.IOException, IOException {
 		
 		return answerService.generateAnswer(loginIdx, answerDto);
 	}
 	
+	/**
+	 * 답변 재생성하기
+	 * @param answerDto
+	 * @return
+	 * @throws IOException 
+	 * @throws io.jsonwebtoken.io.IOException 
+	 */
+	@SecurityRequirement(name = "token")
+	@PostMapping("/answer/generate/retry")
+	public ApiResult<Object> answerRetry(@RequestBody AnswerDto answerDto) throws io.jsonwebtoken.io.IOException, IOException {
+		
+		return answerService.retryAnswer(answerDto);
+	}
+	
+	/**
+	 * 생성한 답변 히스토리 보기
+	 * @param loginIdx
+	 * @return
+	 */
 	@SecurityRequirement(name = "token")
 	@GetMapping("/answer/log/get")
 	public ApiResult<Object> answerLogGet(@LoginIdx Integer loginIdx) {
 		
 		return answerService.getAnswerLog(loginIdx);
 	}
+	
+	
 }

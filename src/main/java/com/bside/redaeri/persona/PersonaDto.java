@@ -10,7 +10,7 @@ import lombok.Setter;
 public class PersonaDto {
 
     @Schema(description = "생성된 페르소나 idx", example = "1")
-    private int idx;
+    private int personaIdx;
     
     @Schema(description = "가게 idx", example = "1")
     private int storeIdx;

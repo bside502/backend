@@ -8,8 +8,7 @@ spring:
       enabled: true
       max-file-size: 3MB
       max-request-size: 3MB
-   
-    
+
 server:
   port: 8080
 
@@ -33,14 +32,15 @@ kakao:
 
 naver:
   client:
-    id: ENC(gIXgYviq5ldzdlpHH8OnOQF8WvWs4SBF3payxf/FU4qYxWot5eO/S2LMLyjPOyb8Kane5cS23eqpB5bgYp/NYg==)
-    key: ENC(2DmxFT54OFl8wIPgWXti+dsnfSearjpe8mT+s98iPbgeOG9Jp8df/JDNjkb4Hyfb)
+    id: ENC(ega5cdytiZomKKvFyW8G8nctn8DDA2jHdX6m/dQRnEHgODAJLbYrXnXVQjvhHBFC/GqAEaJOyMT3inwP5XyJrw==)
+    key: ENC(yyfzJmigPwj35bpVIG5OUGAXCNUOBRwWVV1XcHC0wEx/gO3RG/fLkb11G7MzNORJ)
 
 logging:
-  level:
-    root: DEBUG
-    org.apache.ibatis: DEBUG  # MyBatis SQL 실행 로그
+  config: classpath:log4j2.yml
 
+mybatis:
+  configuration:
+    call-setters-on-nulls: true
 
 
 ---
@@ -52,9 +52,10 @@ spring:
       - local
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3307/redaeri?serverTimezone=UTC&characterEncoding=UTF-8
-    username: ENC(ttOlbqf+jEsgiKszV/DrLFz7EqAGyGmRty5zBKQYPb42XRxX3BIkA7hMbIZi4XqZ)
-    password: ENC(5O7so2/IIbHAxjsaYcV6H5fls9fy5xQ7Fj8U1ZuiLpojFM3nnDZ92J3+96OCWkfC)
+    url: jdbc:mysql://211.188.52.86:3306/redaeri?serverTimezone=UTC&characterEncoding=UTF-8
+    username: ENC(at0vUhvo6SgjXkxjOulOdzXLUb1Pne8lAP+7ZR+GiPCQ2ha/lr9n/8NH7bJQ7M1x)
+    password: ENC(bPrwxSJhPCW90gRJLxaK+JOji9ZVXxZabP1oDgzgUWLnfsv7361qpIwlnhqjbHsq)
+
 
 ---
 
@@ -68,4 +69,3 @@ spring:
     url: jdbc:mysql://211.188.52.86:3306/redaeri?serverTimezone=UTC&characterEncoding=UTF-8
     username: ENC(at0vUhvo6SgjXkxjOulOdzXLUb1Pne8lAP+7ZR+GiPCQ2ha/lr9n/8NH7bJQ7M1x)
     password: ENC(bPrwxSJhPCW90gRJLxaK+JOji9ZVXxZabP1oDgzgUWLnfsv7361qpIwlnhqjbHsq)
-

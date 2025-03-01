@@ -24,4 +24,7 @@ public class AnalyzeDto {
 
     @Schema(description = "세 번째 텍스트", example = "세 번째 내용")
     private String uploadTextThird;
+    
+    @Schema(description = "personaIdx", example = "")
+    private int personaIdx;
 }

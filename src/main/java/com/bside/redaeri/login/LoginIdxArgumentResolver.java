@@ -30,7 +30,10 @@ public class LoginIdxArgumentResolver implements HandlerMethodArgumentResolver {
         HttpServletRequest request = (HttpServletRequest) webRequest.getNativeRequest();
         
         String token = request.getHeader("token");
-        System.out.println(token);
+        
+        if(jwtService.isExpired(token)) {
+        	return null;
+        }
         
         int login_idx = jwtService.getUserIdx(token);
         

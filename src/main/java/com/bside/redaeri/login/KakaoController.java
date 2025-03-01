@@ -27,7 +27,7 @@ public class KakaoController {
 	
 	//REST API app key
 	@Value("${kakao.client.id}")
-	private static String KAKAO_CLIENT_ID;
+	private String KAKAO_CLIENT_ID;
 	
 	//redirect url
 	private static final String KAKAO_REDIRECT_URI = "http://localhost:5671/oauth";

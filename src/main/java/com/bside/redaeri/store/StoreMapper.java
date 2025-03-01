@@ -8,6 +8,9 @@ import org.apache.ibatis.annotations.Update;
 @Mapper
 public interface StoreMapper {
 	
+	@Select("SELECT store_name as storeName, store_type as storeType FROM store s WHERE s.user_idx = #{loginIdx}")
+	public StoreDto getStoreInfo(Integer loginIdx);
+	
 	@Select("SELECT COUNT(*) FROM store s WHERE s.user_idx = #{loginIdx}")
 	public int getStoreCount(StoreDto storeDto);
 

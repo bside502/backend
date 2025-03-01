@@ -19,7 +19,7 @@ public class JWTService {
 	@Value("${jwt.secret.key}")
 	private String key;
 	
-	private static final long EXPIRATION_TIME = 1000 * 60 * 60 * 24; // 1일
+	private static final long EXPIRATION_TIME = 1000 * 60 * 60 * 24 * 10; // 10일
 	
     private SecretKey secretKey() {
 		return new SecretKeySpec(key.getBytes(StandardCharsets.UTF_8), Jwts.SIG.HS256.key().build().getAlgorithm());
@@ -51,6 +51,7 @@ public class JWTService {
 		 if(accessToken == null || accessToken.length() == 0) {
 			 return null;
 		 }
+		 
 		 
 		 Integer idx = Jwts.parser()
 					.verifyWith(secretKey())

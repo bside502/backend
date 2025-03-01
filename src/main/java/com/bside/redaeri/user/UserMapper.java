@@ -27,12 +27,14 @@ public interface UserMapper {
 	        "FROM user u " +
 	        "LEFT JOIN store s ON s.user_idx = u.idx " +
 	        "LEFT JOIN persona p ON s.idx = p.store_idx " +
-	        "WHERE u.idx = #{loginIdx}")
+	        "WHERE u.idx = #{loginIdx} LIMIT 1") // limit 임시
 	public Map<String, Object> getUserInfo(Integer loginIdx);
 	
 	@Select("SELECT COUNT(*) FROM answer_generate_log WHERE user_idx = #{loginIdx}")
 	public int countUserAnswer(Integer loginIdx);
 	
+	@Select("SELECT COUNT(*) FROM user WHERE idx = #{loginIdx}")
+	public int existsUser(int loginIdx);
 	
 	@Select("SELECT idx as userIdx FROM user WHERE user_id = #{accessToken}")
 	public Integer existUser(String accessToken);

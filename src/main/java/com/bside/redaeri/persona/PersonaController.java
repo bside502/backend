@@ -19,6 +19,7 @@ import com.bside.redaeri.login.LoginIdx;
 import com.bside.redaeri.util.ApiResult;
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -36,9 +37,20 @@ public class PersonaController {
 	@SecurityRequirement(name = "token")
 	@PostMapping(value = "/persona/analyze")
 	public ApiResult<Object> personaAnalyze(
-			@RequestParam("reviewImgFiles") List<MultipartFile> reviewImgFiles,
-			@RequestParam AnalyzeDto analyzeDto,
-			@LoginIdx Integer loginIdx) throws IOException {
+			@RequestParam(value = "uploadFileList", required = false) List<MultipartFile> uploadFileList,
+		    HttpServletRequest request,
+		    @LoginIdx Integer loginIdx) throws IOException {
+		
+		request.getParameter("uploadTextFirst");
+		
+		AnalyzeDto analyzeDto = new AnalyzeDto();
+		analyzeDto.setUploadFileList(uploadFileList);
+		analyzeDto.setUploadTextFirst(request.getParameter("uploadTextFirst"));
+		analyzeDto.setUploadTextSecond(request.getParameter("uploadTextSecond"));
+		analyzeDto.setUploadTextThird(request.getParameter("uploadTextThird"));
+		if(request.getParameter("personaIdx") != null) {
+			analyzeDto.setPersonaIdx(Integer.parseInt(request.getParameter("personaIdx")));
+		}
 		
 		return personaService.personaAnalyze(analyzeDto, loginIdx);
 	}
@@ -62,9 +74,9 @@ public class PersonaController {
 	 */
 	@SecurityRequirement(name = "token")
 	@PatchMapping("/persona/update")
-	public ApiResult<Object> personaUpdate(@RequestBody PersonaDto personaDto) {
+	public ApiResult<Object> personaUpdate(@LoginIdx Integer loginIdx, @RequestBody PersonaDto personaDto) {
 		
-		return personaService.updatePersonaInfo(personaDto);
+		return personaService.updatePersonaInfo(loginIdx, personaDto);
 	}
 	
 	/**

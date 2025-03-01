@@ -22,8 +22,8 @@ public class JastpyConfig {
         String encryptPassword = jasyptEncrypt(password);
         String decrytPassword = jasyptDecryt(encryptPassword);
 
-        System.out.println("encryptPassword : " + encryptPassword);
-        System.out.println("decrytPassword : " + decrytPassword);
+        //System.out.println("encryptPassword : " + encryptPassword);
+        //System.out.println("decrytPassword ===========> " + decrytPassword);
 		
         PooledPBEStringEncryptor encryptor = new PooledPBEStringEncryptor();
         SimpleStringPBEConfig config = new SimpleStringPBEConfig();

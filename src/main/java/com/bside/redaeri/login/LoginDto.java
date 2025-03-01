@@ -11,6 +11,6 @@ public class LoginDto {
     @Schema(description = "naver code", example = "")
     private String code;
     
-    @Schema(description = "naver status", example = "")
-    private String status;
+    @Schema(description = "naver state", example = "")
+    private String state;
 }
