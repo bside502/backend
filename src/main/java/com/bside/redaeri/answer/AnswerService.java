@@ -84,8 +84,9 @@ public class AnswerService {
 		Map<String, Object> personaInfo = personaMapper.getPersonaInfo(storeIdx);
 		
 		// 리뷰 분류
+		String engine = "HCX-003";
 		String prompt = ClovaPromptTemplates.ANSWER_GENERATE("answerGenerate/reviewAnalyze.json", answerDto.getReviewText());
-		String answer = clovaService.generateChatResponse(prompt);
+		String answer = clovaService.generateChatResponse(prompt, engine);
 		answerDto.setReviewType(answer);
 		System.out.println("type --> " + answer);
 		
@@ -95,6 +96,7 @@ public class AnswerService {
 		
 		String promptPath = "answerGenerate/";
 		if(persona.contains("알바생")) {
+			engine = "HCX-DASH-001";
 			promptPath += "generateAnswer1.json";
 		} else if(persona.contains("나이스")) {
 			promptPath += "generateAnswer2.json";
@@ -109,7 +111,7 @@ public class AnswerService {
 		String content = answerDto.getReviewText() + "\n" + 
 		"필수로 들어가야 하는 문구 : " + answerDto.getIncludeText();
 		prompt = ClovaPromptTemplates.ANSWER_GENERATE(promptPath, content);
-		answer = clovaService.generateChatResponse(prompt);
+		answer = clovaService.generateChatResponse(prompt, engine);
 		answerDto.setGenerateAnswer(answer);
 		
 		int result = answerMapper.insertAnswerGenerateLog(answerDto);
@@ -129,8 +131,10 @@ public class AnswerService {
 		Map<String, Object> personaInfo = personaMapper.getPersonaInfo(answerDto.getStoreIdx());
 
 		String persona = (String) personaInfo.get("personaSelect");
+		String engine = "HCX-003";
 		String promptPath = "answerGenerate/";
 		if(persona.contains("알바생")) {
+			engine = "HCX-DASH-001";
 			promptPath += "generateAnswer1.json";
 		} else if(persona.contains("나이스")) {
 			promptPath += "generateAnswer2.json";
@@ -145,7 +149,7 @@ public class AnswerService {
 		String content = answerDto.getReviewText() + "\n" + 
 		"필수로 들어가야 하는 문구 : " + answerDto.getIncludeText();
 		String prompt = ClovaPromptTemplates.ANSWER_GENERATE(promptPath, content);
-		String answer = clovaService.generateChatResponse(prompt);
+		String answer = clovaService.generateChatResponse(prompt, engine);
 		
 		answerDto.setGenerateAnswer(answer);
 		int cnt = answerMapper.updateAnswerGenerateLog(answerDto);

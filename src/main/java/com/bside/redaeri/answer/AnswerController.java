@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -59,7 +60,7 @@ public class AnswerController {
 	 * @throws io.jsonwebtoken.io.IOException 
 	 */
 	@SecurityRequirement(name = "token")
-	@PostMapping("/answer/generate/retry")
+	@PatchMapping("/answer/generate/retry")
 	public ApiResult<Object> answerRetry(@RequestBody AnswerDto answerDto) throws io.jsonwebtoken.io.IOException, IOException {
 		
 		return answerService.retryAnswer(answerDto);

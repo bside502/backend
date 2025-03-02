@@ -7,6 +7,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
+import java.util.UUID;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -40,8 +41,10 @@ public class ClovaService {
 	 * @param type
 	 * @return 
 	 */
-	public String generateChatResponse(String prompt) {
-        String urlString = "https://clovastudio.stream.ntruss.com/testapp/v1/chat-completions/HCX-DASH-001";
+	public String generateChatResponse(String prompt, String engine) {
+		
+        String urlString = "https://clovastudio.stream.ntruss.com/testapp/v1/chat-completions/" + engine;
+        String uuid = UUID.randomUUID().toString();  // 랜덤 UUID 생성
        
     	StringBuilder sb = new StringBuilder();
 
@@ -51,7 +54,7 @@ public class ClovaService {
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("POST");
             conn.setRequestProperty("Authorization", "Bearer " + API_KEY);
-            conn.setRequestProperty("X-NCP-CLOVASTUDIO-REQUEST-ID", REQUEST_ID);
+            conn.setRequestProperty("X-NCP-CLOVASTUDIO-REQUEST-ID", uuid);
             conn.setRequestProperty("Content-Type", "application/json");
             conn.setRequestProperty("Accept", "text/event-stream");
             conn.setDoOutput(true);

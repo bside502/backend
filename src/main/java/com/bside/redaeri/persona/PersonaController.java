@@ -41,8 +41,6 @@ public class PersonaController {
 		    HttpServletRequest request,
 		    @LoginIdx Integer loginIdx) throws IOException {
 		
-		request.getParameter("uploadTextFirst");
-		
 		AnalyzeDto analyzeDto = new AnalyzeDto();
 		analyzeDto.setUploadFileList(uploadFileList);
 		analyzeDto.setUploadTextFirst(request.getParameter("uploadTextFirst"));
@@ -51,7 +49,10 @@ public class PersonaController {
 		if(request.getParameter("personaIdx") != null) {
 			analyzeDto.setPersonaIdx(Integer.parseInt(request.getParameter("personaIdx")));
 		}
-		
+		System.out.println("analyzeDto --> " + analyzeDto.getUploadTextFirst());
+		System.out.println("analyzeDto --> " + analyzeDto.getUploadTextSecond());
+		System.out.println("analyzeDto --> " + analyzeDto.getUploadTextThird());
+
 		return personaService.personaAnalyze(analyzeDto, loginIdx);
 	}
 	
@@ -59,10 +60,12 @@ public class PersonaController {
 	 * 말투 직접 선택해서 저장
 	 * @param PersonaDto
 	 * @return
+	 * @throws IOException 
+	 * @throws io.jsonwebtoken.io.IOException 
 	 */
 	@SecurityRequirement(name = "token")
 	@PostMapping("/persona/insert")
-	public ApiResult<Object> personaInsert(@LoginIdx Integer loginIdx, @RequestBody PersonaDto personaDto) {
+	public ApiResult<Object> personaInsert(@LoginIdx Integer loginIdx, @RequestBody PersonaDto personaDto) throws io.jsonwebtoken.io.IOException, IOException {
 		
 		return personaService.insertPersonaInfo(loginIdx, personaDto);
 	}
@@ -71,10 +74,12 @@ public class PersonaController {
 	 * 말투 직접 수정해서 저장
 	 * @param param
 	 * @return
+	 * @throws IOException 
+	 * @throws io.jsonwebtoken.io.IOException 
 	 */
 	@SecurityRequirement(name = "token")
 	@PatchMapping("/persona/update")
-	public ApiResult<Object> personaUpdate(@LoginIdx Integer loginIdx, @RequestBody PersonaDto personaDto) {
+	public ApiResult<Object> personaUpdate(@LoginIdx Integer loginIdx, @RequestBody PersonaDto personaDto) throws io.jsonwebtoken.io.IOException, IOException {
 		
 		return personaService.updatePersonaInfo(loginIdx, personaDto);
 	}
