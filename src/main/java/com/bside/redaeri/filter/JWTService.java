@@ -15,10 +15,11 @@ import io.jsonwebtoken.Jwts;
 
 @Service
 public class JWTService {
+	
 	@Value("${jwt.secret.key}")
 	private String key;
 	
-	private static final long EXPIRATION_TIME = 1000 * 60 * 60 * 24; // 1일
+	private static final long EXPIRATION_TIME = 1000 * 60 * 60 * 24 * 10; // 10일
 	
     private SecretKey secretKey() {
 		return new SecretKeySpec(key.getBytes(StandardCharsets.UTF_8), Jwts.SIG.HS256.key().build().getAlgorithm());
@@ -45,19 +46,24 @@ public class JWTService {
 		 return generateToken(param);
 	 }
 	 
-	 public String getUserIdx(String jwt) {
+	 public Integer getUserIdx(String jwt) {
 		 String accessToken = jwt;
 		 if(accessToken == null || accessToken.length() == 0) {
 			 return null;
 		 }
 		 
-		// 값 가져오기
-		return Jwts.parser()
-				.verifyWith(secretKey())
-				.build()
-				.parseSignedClaims(jwt)
-				.getPayload()
-				.get("user_idx", String.class);
+		 
+		 Integer idx = Jwts.parser()
+					.verifyWith(secretKey())
+					.build()
+					.parseSignedClaims(jwt)
+					.getPayload()
+					.get("loginIdx", Integer.class);
+		 
+		 if(idx == null) {
+			 idx = 0;
+		 }
+		 return idx;
 	 }
 	 
 	 // 로그인 만료 시간

@@ -1,4 +1,4 @@
-package com.bside.redaeri.user;
+package com.bside.redaeri.login;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -8,79 +8,84 @@ import java.net.URL;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bside.redaeri.filter.JWTService;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 @RestController
 @RequestMapping("/api/v1/")
-public class LoginController {
+public class KakaoController {
 	
 	@Autowired
 	private JWTService jwtService;
 	
-	private static String NAVER_CLIENT_ID = "";
-	private static String NAVER_CLIENT_SECRET = "";
-
-	private static String NAVER_TOKEN_URL = "https://nid.naver.com/oauth2.0/token";
-	private static String NAVER_USER_INFO_URL = "https://openapi.naver.com/v1/nid/me";
+	private static final String KAKAO_API_URL = "https://kauth.kakao.com/oauth/token";
+	private static final String KAKAO_USER_INFO_URL = "https://kapi.kakao.com/v2/user/me";
 	
-	@PostMapping("/naver/callback")
-	public void naverCallback(@RequestBody Map<String, Object> param) throws IOException {
+	//REST API app key
+	@Value("${kakao.client.id}")
+	private String KAKAO_CLIENT_ID;
+	
+	//redirect url
+	private static final String KAKAO_REDIRECT_URI = "http://localhost:5671/oauth";
+	
+	private static final String CONTENT_TYPE = "application/x-www-form-urlencoded;charset=utf-8";
+	
+	public void kakaoCallback(@RequestBody Map<String, Object> param) throws IOException {
 		try {
 			String code = (String) param.get("code");
-			String state = (String) param.get("state");
 
-			if (code == null || state == null) {
+			if(code == null) {
 				throw new Exception();
 			}
-
-			String accessToken = getAccessToken(code, state);
-
+			String accessToken = getAccessToken(code);
+			
 			Map<String, Object> userInfo = getUserProfile(accessToken);
 			// todo 이미 등록된 회원인지 확인
 			
 			String jwtToken = jwtService.generateToken(userInfo);
-
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
-
-	private String getAccessToken(String code, String state) throws IOException {
-		String requestURL = NAVER_TOKEN_URL 
+	
+	public String getAccessToken(String code) {
+		String requestURL = KAKAO_API_URL
 				+ "?grant_type=authorization_code"
-				+ "&client_id=" + NAVER_CLIENT_ID
-				+ "&client_secret=" + NAVER_CLIENT_SECRET 
-				+ "&code=" + code 
-				+ "&state=" + state;
-
+				+ "&cliend_id=" + KAKAO_CLIENT_ID
+				+ "&redirect_uri=" + KAKAO_REDIRECT_URI
+				+ "&code=" + code;
+		
 		try {
-
 			URL url = new URL(requestURL);
+		
 			HttpURLConnection con = (HttpURLConnection) url.openConnection();
-			con.setRequestMethod("GET");
-
+			con.setRequestMethod("POST");
+			con.setDoOutput(true);
+			
 			BufferedReader br;
 			int responseCode = con.getResponseCode();
-
-			if (responseCode == 200) { // 정상 호출
+			
+			if (responseCode == 200) {
 				br = new BufferedReader(new InputStreamReader(con.getInputStream()));
 			} else {
 				br = new BufferedReader(new InputStreamReader(con.getErrorStream()));
 			}
-
+			
 			String inputLine;
 			StringBuilder response = new StringBuilder();
 			while ((inputLine = br.readLine()) != null) {
 				response.append(inputLine);
 			}
+			
 			br.close();
 			System.out.println("accessToken ==> " + response.toString());
+			
+			// Todo
 			String accessToken = response.toString().split("\"access_token\":\"")[1].split("\"")[0];
 			
 			return accessToken;
@@ -89,27 +94,29 @@ public class LoginController {
 		}
 		return null;
 	}
-
+	
+	
 	private Map<String, Object> getUserProfile(String accessToken) {
 		try {
-			URL url = new URL(NAVER_USER_INFO_URL);
-			HttpURLConnection con = (HttpURLConnection) url.openConnection();
-			con.setRequestMethod("GET");
-			con.setRequestProperty("Authorization", "Bearer " + accessToken);
-		
-			BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
-			String inputLine;
-			StringBuilder response = new StringBuilder();
 			
-			while ((inputLine = br.readLine()) != null) {
-				response.append(inputLine);
-			}
-			br.close();
+		URL url = new URL(KAKAO_USER_INFO_URL);
+		HttpURLConnection con = (HttpURLConnection) url.openConnection();
 		
-			ObjectMapper objectMapper = new ObjectMapper();
-			Map<String, Object> jsonMap = objectMapper.readValue(response.toString(), Map.class);
-		     
-			return (Map<String, Object>) jsonMap.get("response");	 
+		con.setRequestMethod("GET");
+		con.setRequestProperty("Authorization", "Bearer " + accessToken);
+		con.setRequestProperty("Content-Type", CONTENT_TYPE);
+		
+		BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
+		String inputLine;
+		StringBuilder response = new StringBuilder();
+		
+		while ((inputLine = br.readLine()) != null) {
+			response.append(inputLine);
+		}
+		br.close();
+		
+		System.out.println(response.toString());
+		
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
