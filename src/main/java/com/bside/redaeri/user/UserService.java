@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.bside.redaeri.filter.JWTService;
 import com.bside.redaeri.util.ApiResult;
+import com.bside.redaeri.vo.ResponseCode;
 
 @Service
 public class UserService {
@@ -29,9 +30,9 @@ public class UserService {
 		result = userMapper.getUserInfo(loginIdx);
 		
 		if(result != null) {
-			return ApiResult.success("200", "성공", result);
+			return ApiResult.success(ResponseCode.OK, result);
 		} else {
-			return ApiResult.success("400", "실패", null);
+			return ApiResult.error(ResponseCode.FAIL);
 		}
 		
 	}
@@ -48,7 +49,7 @@ public class UserService {
 		Map<String, Object> result = new HashMap<>();
 		result.put("answerCount", cnt);
 		
-		return ApiResult.success("200", "성공", result);
+		return ApiResult.success(ResponseCode.OK, result);
 	}
 	
 	public ApiResult<Object> deleteUser(Integer loginIdx) {
@@ -58,6 +59,6 @@ public class UserService {
 		// 페르소나
 		// 로그 삭제
 		
-		return ApiResult.success("200", "성공", null);
+		return ApiResult.success(ResponseCode.OK, null);
 	}
 }

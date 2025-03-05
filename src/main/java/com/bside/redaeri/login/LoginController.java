@@ -20,6 +20,7 @@ import com.bside.redaeri.filter.JWTService;
 import com.bside.redaeri.user.UserDto;
 import com.bside.redaeri.user.UserMapper;
 import com.bside.redaeri.util.ApiResult;
+import com.bside.redaeri.vo.ResponseCode;
 
 @RestController
 @RequestMapping("/api/v1/")
@@ -50,7 +51,7 @@ public class LoginController {
 		
 		
 		if(accessToken == null) {
-			return ApiResult.success("1001","accessToken 발급 실패", null);
+			return ApiResult.error(ResponseCode.FAIL_ACCESSTOKEN_ISSUE);
 		}
 		
 		Map<String, Object> userInfo = new HashMap<>();
@@ -62,7 +63,7 @@ public class LoginController {
 			if(idx == 1) {
 				userInfo.put("loginIdx", userDto.getIdx());
 			} else {
-				return ApiResult.success("1002", "회원 가입 실패", null);
+				return ApiResult.error(ResponseCode.FAIL_ADD_USER);
 			}
 		} else { // 회원 o
 			userInfo.put("loginIdx", userIdx);
@@ -70,8 +71,8 @@ public class LoginController {
 		String jwtToken = jwtService.generateToken(userInfo);
 		userInfo.put("token", jwtToken);
 		
-		return ApiResult.success("200", "성공", userInfo);
-	}
+		return ApiResult.success(ResponseCode.OK, userInfo);
+ 	}
 
 	private String getAccessToken(String code, String state) throws IOException {
 		String requestURL = NAVER_TOKEN_URL 

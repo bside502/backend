@@ -1,32 +1,40 @@
 package com.bside.redaeri.clova;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-
-import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
 
+import com.fasterxml.jackson.core.exc.StreamReadException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import io.jsonwebtoken.io.IOException;
 @Service
 public class ClovaService {
 	
 	@Value("${clova.api.key}")
 	private String API_KEY;
-	
-	@Value("${clova.request.id}")
-	private String REQUEST_ID;
 	
 	@Value("${clova.ocr.url}")
 	private String API_URL;
@@ -34,6 +42,37 @@ public class ClovaService {
 	@Value("${clova.ocr.key}")
 	private String API_OCR_KEY;
 	
+	
+	/**
+	 * 프롬프트 파일 읽기
+	 * @param filePath
+	 * @param content
+	 * @return
+	 * @throws IOException
+	 * @throws java.io.IOException
+	 */
+	@SuppressWarnings("unchecked")
+	public String readPromptFileToJson(String filePath, String content) throws IOException, java.io.IOException {
+		ClassPathResource resource = new ClassPathResource(filePath);
+        File file = resource.getFile();
+        
+		ObjectMapper objectMapper = new ObjectMapper();
+
+		try {
+            Map<String, Object> jsonMap = objectMapper.readValue(file, new TypeReference<>() {});
+            List<Map<String, Object>> messages = (List<Map<String, Object>>) jsonMap.get("messages");
+
+            // "messages" 배열 가져오기
+            if (!messages.isEmpty()) {
+                messages.get(messages.size() - 1).put("content", content);
+            }
+            
+            return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(jsonMap);
+		} catch (IOException e) {
+			e.printStackTrace();
+            return null; // 오류 발생 시 null 반환
+		}
+	}
 	//clova studio
 	
 	/**
@@ -89,7 +128,6 @@ public class ClovaService {
                                 ObjectMapper objectMapper = new ObjectMapper();
                                 JsonNode rootNode = objectMapper.readTree(jsonStr);
                                 
-                                int outputLength = rootNode.path("outputLength").asInt();
                             	String content = rootNode.path("message").path("content").asText();
                                 
                                 sb.append(content);

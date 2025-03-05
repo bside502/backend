@@ -16,6 +16,7 @@ import com.bside.redaeri.filter.JWTService;
 import com.bside.redaeri.login.LoginIdx;
 import com.bside.redaeri.user.UserMapper;
 import com.bside.redaeri.util.ApiResult;
+import com.bside.redaeri.vo.ResponseCode;
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
@@ -37,7 +38,7 @@ public class StoreController {
 
 		int cnt = userMapper.existsUser(userIdx);
 		if(cnt == 0) {
-			return ApiResult.error("1003", "존재하지 않는 회원 idx입니다.");
+			return ApiResult.error(ResponseCode.NOT_EXIST_USER);
 		}
 		
 		Map<String, Object> result = new HashMap<>();
@@ -46,7 +47,7 @@ public class StoreController {
 		String jwtToken = jwtService.generateToken(result);
 		result.put("token", jwtToken);
 		
-		return ApiResult.success("201", "새로 발급된 토큰을 사용해주세요", result);
+		return ApiResult.success(ResponseCode.ISSUED, result);
 	}
 	
 	
