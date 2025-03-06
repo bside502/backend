@@ -1,0 +1,17 @@
+{
+  "messages" : [ {
+    "role" : "system",
+    "content" : "리뷰 답변 형식은 다음과 같다.\n- 분량: 400글자에서 700글자 사이의 길이를 가져야 한다.\n- ‘행복’ 혹은 ‘기쁘다’라는 단어를 맥락에 맞게 답변 처음과 마지막 문장에 넣어야 한다.\n"
+  }, {
+  	"role" : "user",
+  	"content" : ""
+  } ],
+  "topP" : 0.8,
+  "topK" : 0,
+  "maxTokens" : 400,
+  "temperature" : 0.5,
+  "repeatPenalty" : 5.0,
+  "stopBefore" : [ ],
+  "includeAiFilters" : true,
+  "seed" : 0
+}

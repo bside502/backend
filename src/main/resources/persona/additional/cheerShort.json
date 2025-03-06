@@ -1,0 +1,17 @@
+{
+  "messages" : [ {
+    "role" : "system",
+    "content" : "리뷰 답변 형식은 다음과 같다.\n- 분량: 200글자에서 400글자 사이의 길이로 짧고 간결해야 한다.\n- ‘힘이 된다’는 내용을 맥락에 맞게 답변 마지막 문장에 넣어야 한다.\n"
+  }, {
+    "role" : "user",
+    "content" : ""
+  } ],
+  "topP" : 0.8,
+  "topK" : 0,
+  "maxTokens" : 300,
+  "temperature" : 0.5,
+  "repeatPenalty" : 5.0,
+  "stopBefore" : [ ],
+  "includeAiFilters" : true,
+  "seed" : 0
+}

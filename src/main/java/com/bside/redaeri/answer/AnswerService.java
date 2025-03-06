@@ -96,7 +96,7 @@ public class AnswerService {
 		answerDto.setPersonaIdx((int) personaInfo.get("personaIdx"));
 		String persona = (String) personaInfo.get("personaSelect");
 		
-		String promptPath = "answerGenerate/";
+		String promptPath = "persona/";
 		if(persona.contains("알바생")) {
 			engine = "HCX-DASH-001";
 			promptPath += "generateAnswer1.json";
@@ -134,7 +134,7 @@ public class AnswerService {
 
 		String persona = (String) personaInfo.get("personaSelect");
 		String engine = "HCX-003";
-		String promptPath = "answerGenerate/";
+		String promptPath = "persona/";
 		if(persona.contains("알바생")) {
 			engine = "HCX-DASH-001";
 			promptPath += "generateAnswer1.json";

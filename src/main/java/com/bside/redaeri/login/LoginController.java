@@ -21,6 +21,7 @@ import com.bside.redaeri.user.UserDto;
 import com.bside.redaeri.user.UserMapper;
 import com.bside.redaeri.util.ApiResult;
 import com.bside.redaeri.vo.ResponseCode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @RestController
 @RequestMapping("/api/v1/")
@@ -37,7 +38,7 @@ public class LoginController {
 
 	private static String NAVER_TOKEN_URL = "https://nid.naver.com/oauth2.0/token";
 	
-	//private static String NAVER_USER_INFO_URL = "https://openapi.naver.com/v1/nid/me";
+	private static String NAVER_USER_INFO_URL = "https://openapi.naver.com/v1/nid/me";
 	//private static String NAVER_CALLBACK_URL = "http://localhost:5671/login-callback";
 	
 	@Autowired
@@ -54,11 +55,14 @@ public class LoginController {
 			return ApiResult.error(ResponseCode.FAIL_ACCESSTOKEN_ISSUE);
 		}
 		
-		Map<String, Object> userInfo = new HashMap<>();
-		Integer userIdx = userMapper.existUser(accessToken);
+		Map<String, Object> userInfo = getUserProfile(accessToken);
+		// {response : {id : xxxx}}
+		
+		Integer userIdx = userMapper.existUser((String) userInfo.get("id"));
+		
 		if(userIdx == null) { //회원 x
 			UserDto userDto = new UserDto();
-			userDto.setUserId(accessToken);
+			userDto.setUserId((String) userInfo.get("id"));
 			int idx = userMapper.insertUser(userDto);
 			if(idx == 1) {
 				userInfo.put("loginIdx", userDto.getIdx());
@@ -68,6 +72,7 @@ public class LoginController {
 		} else { // 회원 o
 			userInfo.put("loginIdx", userIdx);
 		}
+		userInfo.remove("id");
 		String jwtToken = jwtService.generateToken(userInfo);
 		userInfo.put("token", jwtToken);
 		
@@ -113,7 +118,7 @@ public class LoginController {
 		return null;
 	}
 	
-	/*
+	
 	private Map<String, Object> getUserProfile(String accessToken) {
 		try {
 			URL url = new URL(NAVER_USER_INFO_URL);
@@ -139,5 +144,5 @@ public class LoginController {
 		}
 		return null;
 	}
-	*/
+	
 }

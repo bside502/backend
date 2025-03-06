@@ -6,12 +6,11 @@ import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.Select;
-import org.apache.ibatis.annotations.SelectKey;
 
 @Mapper
 public interface UserMapper {
 	
-	@Insert("INSERT INTO user(user_id) VALUES(#{userId})")
+	@Insert("INSERT INTO user(user_id) VALUES(#{id})")
 	@Options(useGeneratedKeys = true, keyProperty = "idx", keyColumn = "idx")
 	public int insertUser(UserDto userDto);
 
@@ -36,8 +35,8 @@ public interface UserMapper {
 	@Select("SELECT COUNT(*) FROM user WHERE idx = #{loginIdx}")
 	public int existsUser(int loginIdx);
 	
-	@Select("SELECT idx as userIdx FROM user WHERE user_id = #{accessToken}")
-	public Integer existUser(String accessToken);
+	@Select("SELECT idx as userIdx FROM user WHERE user_id = #{id}")
+	public Integer existUser(String id);
 	
 	public int deleteUser(Integer loginIdx);
 }

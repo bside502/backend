@@ -1,0 +1,17 @@
+{
+  "messages" : [ {
+    "role" : "system",
+    "content" : "리뷰 답변 형식은 다음과 같다.\n- 분량: 700 글자에서 1000 글자 사이로 긴 편이어야 한다.\n-‘감사’라는 단어를 맥락에 맞게 답변 처음, 중간, 마지막에 넣어야 한다.\n"
+  }, {
+    "role" : "user",
+    "content" : ""
+  } ],
+  "topP" : 0.8,
+  "topK" : 0,
+  "maxTokens" : 2478,
+  "temperature" : 0.5,
+  "repeatPenalty" : 5.0,
+  "stopBefore" : [ ],
+  "includeAiFilters" : true,
+  "seed" : 0
+}
