@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.bside.redaeri.util.ApiResult;
+import com.bside.redaeri.vo.ResponseCode;
 
 @Service
 public class StoreService {
@@ -16,14 +17,14 @@ public class StoreService {
 		int count = storeMapper.getStoreCount(storeDto);
 		if(count != 0) {
 			// 이미 등록된 가게가 존재
-			return ApiResult.success("2001", "이미 하나의 가게를 등록했습니다.", null);
+			return ApiResult.error(ResponseCode.EXIST_STORE); // 삭제 예정
 		}
 		
 		int result = storeMapper.insertStoreInfo(storeDto);
 		if(result == 1) {
-			return ApiResult.success("200", "성공", null);
+			return ApiResult.success(ResponseCode.OK, null);
 		} else {
-			return ApiResult.success("400", "실패", null);
+			return ApiResult.error(ResponseCode.FAIL);
 		}
 	}
 	
@@ -32,14 +33,14 @@ public class StoreService {
 		int count = storeMapper.getStoreCount(storeDto);
 		if(count == 0) {
 			// 등록된 가게가 없음
-			return ApiResult.success("2002", "수정할 가게 정보가 없습니다.", null);
+			return ApiResult.error(ResponseCode.NOT_EXIST_STORE); // 삭제 예정
 		}
 		
 		int result = storeMapper.updateStoreInfo(storeDto);
 		if(result == 1) {
-			return ApiResult.success("200", "성공", null);
+			return ApiResult.success(ResponseCode.OK, null);
 		} else {
-			return ApiResult.success("400", "실패", null);
+			return ApiResult.error(ResponseCode.FAIL); // 삭제 예정
 		}
 	}
 }

@@ -9,14 +9,13 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.bside.redaeri.clova.ClovaPromptTemplates;
 import com.bside.redaeri.clova.ClovaService;
 import com.bside.redaeri.persona.PersonaMapper;
 import com.bside.redaeri.util.ApiResult;
+import com.bside.redaeri.vo.ResponseCode;
 
 @Service
 public class AnswerService {
@@ -37,6 +36,9 @@ public class AnswerService {
 	 * @throws IOException
 	 */
 	public ApiResult<Object> readImageToText(MultipartFile mFile) throws IOException {
+		if(mFile == null) {
+			return ApiResult.error(ResponseCode.FAIL);
+		}
 		
 		String name = mFile.getOriginalFilename();
 		String format = name.substring(name.lastIndexOf(".") + 1, name.length());
@@ -54,7 +56,7 @@ public class AnswerService {
 		Map<String, Object> result = new HashMap<>();
 		result.put("reviewText", answer);
 		
-		return ApiResult.success("200", "성공", result);
+		return ApiResult.success(ResponseCode.OK, result);
 	}
 	
 	/**
@@ -71,12 +73,12 @@ public class AnswerService {
 		// answerDTO 값 넘겨주기
 		int cnt = personaMapper.getStoreCount(loginIdx);
 		if(cnt == 0) {
-			return ApiResult.error("2002", "등록된 가게가 없습니다.");
+			return ApiResult.error(ResponseCode.NOT_EXIST_STORE);
 		}
 		
 		int personaCnt = personaMapper.existPersona(loginIdx);
 		if(personaCnt == 0) {
-			return ApiResult.error("2002", "등록된 페르소나가 없습니다.");
+			return ApiResult.error(ResponseCode.NOT_EXIST_PERSONA);
 		}
 		
 		int storeIdx = personaMapper.getStoreIdx(loginIdx);
@@ -85,7 +87,7 @@ public class AnswerService {
 		
 		// 리뷰 분류
 		String engine = "HCX-003";
-		String prompt = ClovaPromptTemplates.ANSWER_GENERATE("answerGenerate/reviewAnalyze.json", answerDto.getReviewText());
+		String prompt = clovaService.readPromptFileToJson("answerGenerate/reviewAnalyze.json", answerDto.getReviewText());
 		String answer = clovaService.generateChatResponse(prompt, engine);
 		answerDto.setReviewType(answer);
 		System.out.println("type --> " + answer);
@@ -110,12 +112,12 @@ public class AnswerService {
 		
 		String content = answerDto.getReviewText() + "\n" + 
 		"필수로 들어가야 하는 문구 : " + answerDto.getIncludeText();
-		prompt = ClovaPromptTemplates.ANSWER_GENERATE(promptPath, content);
+		prompt = clovaService.readPromptFileToJson(promptPath, content);
 		answer = clovaService.generateChatResponse(prompt, engine);
 		answerDto.setGenerateAnswer(answer);
 		
 		int result = answerMapper.insertAnswerGenerateLog(answerDto);
-		return ApiResult.success("200", "성공", answerDto);
+		return ApiResult.success(ResponseCode.OK, answerDto);
 	}
 	
 	/**
@@ -148,13 +150,13 @@ public class AnswerService {
 		
 		String content = answerDto.getReviewText() + "\n" + 
 		"필수로 들어가야 하는 문구 : " + answerDto.getIncludeText();
-		String prompt = ClovaPromptTemplates.ANSWER_GENERATE(promptPath, content);
+		String prompt = clovaService.readPromptFileToJson(promptPath, content);
 		String answer = clovaService.generateChatResponse(prompt, engine);
 		
 		answerDto.setGenerateAnswer(answer);
 		int cnt = answerMapper.updateAnswerGenerateLog(answerDto);
-		
-		return ApiResult.success("200", "성공", answerDto);
+
+		return ApiResult.success(ResponseCode.OK, answerDto);
 	}
 	
 	/**
@@ -166,7 +168,7 @@ public class AnswerService {
 		
 		List<Map<String, Object>> result = answerMapper.getAnswerGenerateLogList(loginIdx);
 		
-		return ApiResult.success("200", "성공", result);
+		return ApiResult.success(ResponseCode.OK, result);
 	}
 
 }

@@ -11,11 +11,26 @@ import lombok.Getter;
 public enum ResponseCode {
 	// Success
 	OK("200", HttpStatus.OK, "OK"),
+	ISSUED("201", HttpStatus.OK, "새로 발급된 토큰을 사용해주세요"),
+	
+	
 	
 	// fail
 	FAIL("400", HttpStatus.BAD_REQUEST, "FAIL"),
 	
+	// 1001 ~
+	FAIL_ACCESSTOKEN_ISSUE("1001", HttpStatus.OK, "accessToken 발급 실패"),
+	FAIL_ADD_USER("1002", HttpStatus.OK, "회원 가입 실패"),
+	NOT_EXIST_USER("1003", HttpStatus.OK, "존재하지 않는 회원입니다."),
 	
+	// 2001 ~
+	NOT_EXIST_STORE("2001", HttpStatus.OK, "등록된 가게가 없습니다."),
+	
+	EXIST_STORE("2002", HttpStatus.OK, "이미 등록된 가게가 존재합니다"), // 삭제 예정
+	
+	// 3001 ~
+	NOT_EXIST_PERSONA("3001", HttpStatus.OK, "등록된 페르소나가 없습니다."),
+	EXIST_PERSONA("3002", HttpStatus.OK, "이미 페르소나가 존재합니다."),
 	
 	// 99
 	EXPIRE_TOKEN("99", HttpStatus.UNAUTHORIZED, "EXPIRE_TOKEN"),
