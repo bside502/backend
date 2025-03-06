@@ -142,8 +142,15 @@ public class PersonaService {
         
         StoreDto storeDto = storeMapper.getStoreInfo(loginIdx);
         String content = emotion + "하는 내용으로, 문장 길이는 " + personaDto.getLengthSelect() + "으로 만능답변을 생성하세요";
+		// String content = "{"
+		// 	+ "\"emotion\": \"" + emotion + "\", "
+		// 	+ "\"length\": \"" + personaDto.getLengthSelect() + "\", "
+		// 	+ "\"instruction\": \"이 스타일을 반영하여 만능답변을 생성하세요.\""
+		// 	+ "}";
+
         
         System.out.println("cotent -- >" + content);
+		//System.out.println("content -- >" + content);
     	prompt = ClovaPromptTemplates.ANSWER_GENERATE(promptPath, content);
 		answer = clovaService.generateChatResponse(prompt, engine);
 		
