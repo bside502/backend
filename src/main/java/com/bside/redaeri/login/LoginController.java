@@ -39,7 +39,7 @@ public class LoginController {
 	private static String NAVER_TOKEN_URL = "https://nid.naver.com/oauth2.0/token";
 	
 	private static String NAVER_USER_INFO_URL = "https://openapi.naver.com/v1/nid/me";
-	//private static String NAVER_CALLBACK_URL = "http://localhost:5671/login-callback";
+	private static String NAVER_CALLBACK_URL = "http://localhost:5671/login-callback";
 	
 	@Autowired
 	private UserMapper userMapper;

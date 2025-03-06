@@ -49,10 +49,6 @@ public class PersonaController {
 		if(request.getParameter("personaIdx") != null) {
 			analyzeDto.setPersonaIdx(Integer.parseInt(request.getParameter("personaIdx")));
 		}
-		System.out.println("analyzeDto --> " + analyzeDto.getUploadTextFirst());
-		System.out.println("analyzeDto --> " + analyzeDto.getUploadTextSecond());
-		System.out.println("analyzeDto --> " + analyzeDto.getUploadTextThird());
-
 		return personaService.personaAnalyze(analyzeDto, loginIdx);
 	}
 	

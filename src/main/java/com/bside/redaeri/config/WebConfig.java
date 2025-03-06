@@ -29,7 +29,7 @@ public class WebConfig implements WebMvcConfigurer {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
             	registry.addMapping("/**")
-                	.allowedOrigins("https://redaeri.vercel.app", "") // kakao 추가하면 등록
+                	.allowedOrigins("https://redaeri.vercel.app", "http://localhost:5173") // kakao 추가하면 등록
                 	.allowedMethods("GET", "POST", "PATCH", "DELETE")
                 	.allowedHeaders("*");
             }

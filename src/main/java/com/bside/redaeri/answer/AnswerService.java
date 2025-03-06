@@ -15,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.bside.redaeri.clova.ClovaService;
 import com.bside.redaeri.persona.PersonaMapper;
 import com.bside.redaeri.util.ApiResult;
+import com.bside.redaeri.util.PromptUtil;
 import com.bside.redaeri.vo.ResponseCode;
 
 @Service
@@ -86,34 +87,33 @@ public class AnswerService {
 		Map<String, Object> personaInfo = personaMapper.getPersonaInfo(storeIdx);
 		
 		// 리뷰 분류
-		String engine = "HCX-003";
 		String prompt = clovaService.readPromptFileToJson("answerGenerate/reviewAnalyze.json", answerDto.getReviewText());
-		String answer = clovaService.generateChatResponse(prompt, engine);
+		String answer = clovaService.generateChatResponse(prompt, "HCX-003");
 		answerDto.setReviewType(answer);
 		System.out.println("type --> " + answer);
 		
-		// 페르소나에 맞게 리뷰 답변 생성
 		answerDto.setPersonaIdx((int) personaInfo.get("personaIdx"));
+		
+		// 1. 감정 + 길이에 맞게 리뷰 답변 생성
+		Map<String, Object> personaAdditionalPromptInfo = PromptUtil.emotionLengthPromptPath((String) personaInfo.get("emotionSelect"), (String) personaInfo.get("lengthSelect"));
+		
+		prompt = clovaService.readPromptFileToJson((String) personaAdditionalPromptInfo.get("path"), answerDto.getReviewText());
+		String baseAnswer = clovaService.generateChatResponse(prompt, (String) personaAdditionalPromptInfo.get("engine"));
+		System.out.println("baseAnswer --> " + baseAnswer);
+		
+		// 2. 페르소나에 맞게 리뷰 답변 생성
 		String persona = (String) personaInfo.get("personaSelect");
+		Map<String, Object> personaPromptInfo = PromptUtil.personaPromtPath(persona);
 		
-		String promptPath = "persona/";
-		if(persona.contains("알바생")) {
-			engine = "HCX-DASH-001";
-			promptPath += "generateAnswer1.json";
-		} else if(persona.contains("나이스")) {
-			promptPath += "generateAnswer2.json";
-		} else if(persona.contains("유쾌한")) {
-			promptPath += "generateAnswer3.json";
-		} else if(persona.contains("묵묵히")) {
-			promptPath += "generateAnswer4.json";
-		} else {
-			promptPath += "generateAnswer5.json";
+		//TODO 필수 문구 부분.. 생각
+		String content = "";
+		if(answerDto.getIncludeText() != null || answerDto.getIncludeText().strip() != "") {
+			content += "필수로 들어가야 하는 문구 : " + answerDto.getIncludeText() + "\n\n";
 		}
+		content += baseAnswer;
 		
-		String content = answerDto.getReviewText() + "\n" + 
-		"필수로 들어가야 하는 문구 : " + answerDto.getIncludeText();
-		prompt = clovaService.readPromptFileToJson(promptPath, content);
-		answer = clovaService.generateChatResponse(prompt, engine);
+		prompt = clovaService.readPromptFileToJson((String) personaPromptInfo.get("path"), content);
+		answer = clovaService.generateChatResponse(prompt, (String) personaPromptInfo.get("engine"));
 		answerDto.setGenerateAnswer(answer);
 		
 		int result = answerMapper.insertAnswerGenerateLog(answerDto);
@@ -132,28 +132,28 @@ public class AnswerService {
 		answerDto = answerMapper.getLogInfo(answerDto);
 		Map<String, Object> personaInfo = personaMapper.getPersonaInfo(answerDto.getStoreIdx());
 
+		// TODO 
+		// 1. 감정 + 길이에 맞게 리뷰 답변 생성
+		Map<String, Object> personaAdditionalPromptInfo = PromptUtil.emotionLengthPromptPath((String) personaInfo.get("emotionSelect"), (String) personaInfo.get("lengthSelect"));
+		
+		String prompt = clovaService.readPromptFileToJson((String) personaAdditionalPromptInfo.get("path"), answerDto.getReviewText());
+		String baseAnswer = clovaService.generateChatResponse(prompt, (String) personaAdditionalPromptInfo.get("engine"));
+		System.out.println("baseAnswer --> " + baseAnswer);
+		
+		// 2. 페르소나에 맞게 리뷰 답변 생성
 		String persona = (String) personaInfo.get("personaSelect");
-		String engine = "HCX-003";
-		String promptPath = "persona/";
-		if(persona.contains("알바생")) {
-			engine = "HCX-DASH-001";
-			promptPath += "generateAnswer1.json";
-		} else if(persona.contains("나이스")) {
-			promptPath += "generateAnswer2.json";
-		} else if(persona.contains("유쾌한")) {
-			promptPath += "generateAnswer3.json";
-		} else if(persona.contains("묵묵히")) {
-			promptPath += "generateAnswer4.json";
-		} else {
-			promptPath += "generateAnswer5.json";
-		}
+		Map<String, Object> personaPromptInfo = PromptUtil.personaPromtPath(persona);
 		
-		String content = answerDto.getReviewText() + "\n" + 
-		"필수로 들어가야 하는 문구 : " + answerDto.getIncludeText();
-		String prompt = clovaService.readPromptFileToJson(promptPath, content);
-		String answer = clovaService.generateChatResponse(prompt, engine);
-		
+		//TODO 필수 문구 부분.. 생각
+				String content = "";
+				if(answerDto.getIncludeText() != null || answerDto.getIncludeText().strip() != "") {
+					content += "필수로 들어가야 하는 문구 : " + answerDto.getIncludeText() + "\n\n";
+				}
+				content += baseAnswer;		
+		prompt = clovaService.readPromptFileToJson((String) personaPromptInfo.get("path"), content);
+		String answer = clovaService.generateChatResponse(prompt, (String) personaPromptInfo.get("engine"));
 		answerDto.setGenerateAnswer(answer);
+		
 		int cnt = answerMapper.updateAnswerGenerateLog(answerDto);
 
 		return ApiResult.success(ResponseCode.OK, answerDto);

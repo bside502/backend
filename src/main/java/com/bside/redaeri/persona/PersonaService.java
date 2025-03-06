@@ -37,6 +37,8 @@ public class PersonaService {
 	 * @throws IOException 
 	 */
 	public ApiResult<Object> personaAnalyze(AnalyzeDto analyzeDto, Integer loginIdx) throws IOException {
+		
+		//TODO 프롬프트 수정 1~3가지의 답변이 주어진다.
 		StringBuilder sb = new StringBuilder();
 		sb.append("답변 : \n");
 		
@@ -79,7 +81,6 @@ public class PersonaService {
 		
 		String engine = "HCX-003";
 		String prompt = clovaService.readPromptFileToJson("personaAnalyze/personaSelect.json", sb.toString());
-		System.out.println("prompt -- >" + prompt);
 		String answer = clovaService.generateChatResponse(prompt, engine);
 		personaDto.setPersonaSelect(answer);
 		System.out.println("answer --> " + answer);
@@ -89,9 +90,9 @@ public class PersonaService {
 
 		String lengthText = "핵심만 간단하게 단문";
 		if(length.contains("장문")) {
-			lengthText = "적당한 중간 길이";
-		} else if(length.contains("중문")) {
 			lengthText = "정성이 담긴 장문";
+		} else if(length.contains("중문")) {
+			lengthText = "적당한 중간 길이";
 		}
 		personaDto.setLengthSelect(lengthText);
 
@@ -100,7 +101,7 @@ public class PersonaService {
 		String emotionText = "힘이 되는 리뷰로부터 자신감을 충전하고,";
 		if(emotion.contains("감사")) {
 			emotionText = "따뜻한 한마디에 감사하고,";
-		} else if(emotion.contains("행복")) {
+		} else if(emotion.contains("기뻐")) {
 			emotionText = "고객과 소통하며 기뻐하고,";
 		}
 		
@@ -182,12 +183,12 @@ public class PersonaService {
 		String emotion = "힘이 되는 리뷰로부터 자신감을 충전하고,";
 		if(personaDto.getEmotionSelect().contains("감사")) {
 			emotion = "따뜻한 한마디에 감사하고,";
-		} else if(personaDto.getEmotionSelect().contains("행복")) {
+		} else if(personaDto.getEmotionSelect().contains("기뻐")) {
 			emotion = "고객과 소통하며 기뻐하고,";
 		}
 		
 		String length = "핵심만 간단하게 단문";
-		if(personaDto.getLengthSelect().contains("정성")) {
+		if(personaDto.getLengthSelect().contains("장문")) {
 			length = "정성이 담긴 장문";
 		} else if(personaDto.getLengthSelect().contains("알잘딱")) {
 			length = "적당한 중간 길이";
@@ -242,6 +243,7 @@ public class PersonaService {
 		Map<String, Object> personaAdditionalPromptInfo = PromptUtil.emotionLengthPromptPath(personaDto.getEmotionSelect(), personaDto.getLengthSelect());
         String content = "모든 음식 후기에 답변할 수 있는 만능 답변을 생성하세요.";
 		
+        // 1. 감정 + 길이에 맞게 만능 답변 생성
 		String prompt = clovaService.readPromptFileToJson((String) personaAdditionalPromptInfo.get("path"), content);
 		String baseAnswer = clovaService.generateChatResponse(prompt, (String) personaAdditionalPromptInfo.get("engine"));
 		System.out.println("baseAnswer -- >" + baseAnswer + "\npath  -->" +  personaAdditionalPromptInfo.get("path"));
@@ -250,12 +252,12 @@ public class PersonaService {
 		String emotion = "힘이 되는 리뷰로부터 자신감을 충전하고,";
 		if(personaDto.getEmotionSelect().contains("감사")) {
 			emotion = "따뜻한 한마디에 감사하고,";
-		} else if(personaDto.getEmotionSelect().contains("행복")) {
+		} else if(personaDto.getEmotionSelect().contains("기뻐")) {
 			emotion = "고객과 소통하며 기뻐하고,";
 		}
 		
 		String length = "핵심만 간단하게 단문";
-		if(personaDto.getLengthSelect().contains("정성")) {
+		if(personaDto.getLengthSelect().contains("장문")) {
 			length = "정성이 담긴 장문";
 		} else if(personaDto.getLengthSelect().contains("알잘딱")) {
 			length = "적당한 중간 길이";
