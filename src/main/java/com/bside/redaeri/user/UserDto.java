@@ -15,6 +15,8 @@ public class UserDto {
 	@Schema(description = "회원 id", example = "")
 	private String userId;
 	
+	private String accessToken;
+	
 	@Schema(description = "가게의 고유 idx", example = "100")
 	private int storeIdx;
 	

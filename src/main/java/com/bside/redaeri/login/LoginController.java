@@ -11,17 +11,23 @@ import java.util.Map;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
 
 import com.bside.redaeri.filter.JWTService;
 import com.bside.redaeri.user.UserDto;
 import com.bside.redaeri.user.UserMapper;
 import com.bside.redaeri.util.ApiResult;
 import com.bside.redaeri.vo.ResponseCode;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @RestController
@@ -44,12 +50,61 @@ public class LoginController {
 	@Autowired
 	private UserMapper userMapper;
 	
-	@PostMapping("/naver/callback")
+	@GetMapping("/naver/unlink")
+	public ApiResult<Object> naverDelete(@LoginIdx Integer loginIdx) throws JsonMappingException, JsonProcessingException {
+		String accessToken = userMapper.getUserAccessToken(loginIdx);
+		
+		 String url = NAVER_TOKEN_URL + "?grant_type=delete"
+	                + "&client_id=" + NAVER_CLIENT_ID
+	                + "&client_secret=" + NAVER_CLIENT_SECRET
+	                + "&access_token=" + accessToken
+	                + "&service_provider=NAVER";
+
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, null, String.class);
+        // 응답 본문을 JSON 문자열로 가져옴
+        String responseBody = response.getBody();
+        System.out.println(responseBody);
+        
+        // ObjectMapper를 사용하여 JSON 문자열을 Map으로 변환
+        ObjectMapper objectMapper = new ObjectMapper();
+        Map<String, Object> resultMap = objectMapper.readValue(responseBody, Map.class);
+        System.out.println(resultMap.get("result"));
+        
+        if(resultMap.get("result").equals("success")) {
+        	// db 데이터 삭제 진행
+        	userMapper.deleteAnswerGenerateLog(loginIdx);
+        	userMapper.deletePersona(loginIdx);
+        	userMapper.deleteStore(loginIdx);
+        	userMapper.deleteUser(loginIdx);
+        } else {
+        	return ApiResult.error(ResponseCode.FAIL_NAVER_UNLINK);
+        }
+        
+        return ApiResult.success(ResponseCode.OK, resultMap); // 응답 결과 반환
+	}
+	
+	/* 로그인 테스트
+	@GetMapping("/auth/naver")
+	public String getNaverLoginUrl() {
+        String loginUrl = "https://nid.naver.com/oauth2.0/authorize" +
+                "?response_type=code" +
+                "&client_id=" + NAVER_CLIENT_ID +
+                "&redirect_uri=" + "http://localhost:8080/api/v1/naver/callback" +
+                "&state=" + false;
+
+        return "네이버 로그인 URL: <a href='" + loginUrl + "' target='_blank'>" + loginUrl + "</a>";
+    }
+    */
+    	
+	@PostMapping("/naver/callback") //@RequestParam("code") String code, @RequestParam("state") String state
 	public ApiResult<Object> naverCallback(@RequestBody LoginDto loginDto) throws Exception {
 		System.out.println("code--> " + loginDto.getCode() + " : state --> " + loginDto.getState());
 		String accessToken = getAccessToken(loginDto.getCode(), loginDto.getState());
 		System.out.println("accessToken --> " + accessToken);
 		
+		UserDto userDto = new UserDto();
+		userDto.setAccessToken(accessToken);
 		
 		if(accessToken == null) {
 			return ApiResult.error(ResponseCode.FAIL_ACCESSTOKEN_ISSUE);
@@ -57,13 +112,12 @@ public class LoginController {
 		
 		Map<String, Object> userInfo = getUserProfile(accessToken);
 		System.out.println("reponse id --> " + userInfo.get("id"));
+		userDto.setUserId((String) userInfo.get("id"));
 		// {response : {id : xxxx}}
 		
 		Integer userIdx = userMapper.existUser((String) userInfo.get("id"));
 		
 		if(userIdx == null) { //회원 x
-			UserDto userDto = new UserDto();
-			userDto.setUserId((String) userInfo.get("id"));
 			int cnt = userMapper.insertUser(userDto);
 			if(cnt == 1) {
 				userInfo.put("loginIdx", userDto.getIdx());
@@ -71,6 +125,7 @@ public class LoginController {
 				return ApiResult.error(ResponseCode.FAIL_ADD_USER);
 			}
 		} else { // 회원 o
+			userMapper.updateUserToken(userDto);
 			userInfo.put("loginIdx", userIdx);
 		}
 		userInfo.remove("id");

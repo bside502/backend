@@ -2,17 +2,25 @@ package com.bside.redaeri.user;
 
 import java.util.Map;
 
+import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 @Mapper
 public interface UserMapper {
 	
-	@Insert("INSERT INTO user(user_id) VALUES(#{userId})")
+	@Insert("INSERT INTO user(user_id, access_token) VALUES(#{userId}, #{accessToken})")
 	@Options(useGeneratedKeys = true, keyProperty = "idx", keyColumn = "idx")
 	public int insertUser(UserDto userDto);
+	
+	@Update("UPDATE user SET access_token = #{accessToken} WHERE user_id = #{userId}")
+	public int updateUserToken(UserDto userDto);
+	
+	@Select("SELECT access_token FROM user WHERE idx = #{loginIdx}")
+	public String getUserAccessToken(Integer loginIdx);
 
 	@Select("SELECT " +
 	        "u.idx AS userIdx, " +
@@ -38,5 +46,16 @@ public interface UserMapper {
 	@Select("SELECT idx as userIdx FROM user WHERE user_id = #{id} ORDER BY idx limit 1") // 임시
 	public Integer existUser(String id);
 	
+	@Delete("DELETE FROM user WHERE idx = #{loginIdx}")
 	public int deleteUser(Integer loginIdx);
+	
+	@Delete("DELETE FROM store s WHERE s.user_idx = #{loginIdx}")
+	public int deleteStore(Integer loginIdx);
+	
+	@Delete("DELETE FROM persona p WHERE p.store_idx = (SELECT idx FROM store s WHERE s.user_idx = #{loginIdx})")
+	public int deletePersona(Integer loginIdx);
+	
+	@Delete("DELETE FROM answer_generate_log WHERE user_idx = #{loginIdx}")
+	public int deleteAnswerGenerateLog(Integer loginIdx);
+	
 }

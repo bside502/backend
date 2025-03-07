@@ -22,6 +22,8 @@ public enum ResponseCode {
 	FAIL_ACCESSTOKEN_ISSUE("1001", HttpStatus.OK, "accessToken 발급 실패"),
 	FAIL_ADD_USER("1002", HttpStatus.OK, "회원 가입 실패"),
 	NOT_EXIST_USER("1003", HttpStatus.OK, "존재하지 않는 회원입니다."),
+	FAIL_NAVER_UNLINK("1004", HttpStatus.OK, "네이버 철회 오류"),
+	
 	
 	// 2001 ~
 	NOT_EXIST_STORE("2001", HttpStatus.OK, "등록된 가게가 없습니다."),

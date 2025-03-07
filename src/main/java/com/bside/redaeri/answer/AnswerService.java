@@ -107,7 +107,7 @@ public class AnswerService {
 		
 		//TODO 필수 문구 부분.. 생각
 		String content = "";
-		if(answerDto.getIncludeText() != null || answerDto.getIncludeText().strip() != "") {
+		if(answerDto.getIncludeText() != null && answerDto.getIncludeText().strip() != "") {
 			content += "필수로 들어가야 하는 문구 : " + answerDto.getIncludeText() + "\n\n";
 		}
 		content += baseAnswer;
@@ -145,11 +145,11 @@ public class AnswerService {
 		Map<String, Object> personaPromptInfo = PromptUtil.personaPromtPath(persona);
 		
 		//TODO 필수 문구 부분.. 생각
-				String content = "";
-				if(answerDto.getIncludeText() != null || answerDto.getIncludeText().strip() != "") {
-					content += "필수로 들어가야 하는 문구 : " + answerDto.getIncludeText() + "\n\n";
-				}
-				content += baseAnswer;		
+		String content = "";
+		if(answerDto.getIncludeText() != null && answerDto.getIncludeText().strip() != "") {
+			content += "필수로 들어가야 하는 문구 : " + answerDto.getIncludeText() + "\n\n";
+		}
+		content += baseAnswer;		
 		prompt = clovaService.readPromptFileToJson((String) personaPromptInfo.get("path"), content);
 		String answer = clovaService.generateChatResponse(prompt, (String) personaPromptInfo.get("engine"));
 		answerDto.setGenerateAnswer(answer);

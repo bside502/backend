@@ -40,6 +40,7 @@ public class JWTFilter extends OncePerRequestFilter {
 		String token = request.getHeader("token");
 		if(token == null || token == "") {
 			// auth error 떨구기
+			//response.sendRedirect("/");
 			return;
 		}
 		
