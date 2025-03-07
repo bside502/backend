@@ -54,7 +54,6 @@ public class PersonaService {
 				String format = name.substring(name.lastIndexOf(".") + 1, name.length());
 				Map<String, Object> imgInfo = new HashMap<>();
 				
-				// todo 한번에 보낼 수 있도록 수정
 				imgInfo.put("requestId", UUID.randomUUID().toString());
 				imgInfo.put("timestamp", Instant.now().toEpochMilli());
 				imgInfo.put("format", format);
@@ -81,9 +80,20 @@ public class PersonaService {
 		
 		String engine = "HCX-003";
 		String prompt = clovaService.readPromptFileToJson("personaAnalyze/personaSelect.json", sb.toString());
-		String answer = clovaService.generateChatResponse(prompt, engine);
-		personaDto.setPersonaSelect(answer);
-		System.out.println("answer --> " + answer);
+		String persona = clovaService.generateChatResponse(prompt, engine);
+		
+		String personaText = "nicePersona";
+		if(persona.contains("해피")) {
+			personaText = "happyPersona";
+		} else if(persona.contains("유쾌한")) {
+			personaText = "pleasantPersona";
+		} else if(persona.contains("묵묵히")) {
+			personaText = "silentPersona";
+		} else if(persona.contains("충청도")) {
+			personaText = "chungcheongdoPersona";
+		}
+		personaDto.setPersonaSelect(personaText);
+		System.out.println("persona --> " + personaText);
 
 		prompt = clovaService.readPromptFileToJson("personaAnalyze/lengthSelect.json", sb.toString());
 		String length = clovaService.generateChatResponse(prompt, engine);
@@ -117,18 +127,16 @@ public class PersonaService {
 		prompt = clovaService.readPromptFileToJson((String) personaAdditionalPromptInfo.get("path"), content);
 		String baseAnswer = clovaService.generateChatResponse(prompt, (String) personaAdditionalPromptInfo.get("engine"));
 		
-        String persona = personaDto.getPersonaSelect();
+        persona = personaDto.getPersonaSelect();
 		// 페르소나 인물 프롬프트 정보 가져오기
 		Map<String, Object> personaPromptInfo = PromptUtil.personaPromtPath(persona);
-		
 		personaDto.setPersonaImgType((int) personaPromptInfo.get("type"));
-		personaDto.setPersonaSelect((String) personaPromptInfo.get("name"));
 		
 		//StoreDto storeDto = storeMapper.getStoreInfo(loginIdx);
 		
 		// baseAnswer --> 1차로 생성한 답변에서 추가로 프롬프트 더 작성해야하는지 테스트
         prompt = clovaService.readPromptFileToJson((String) personaPromptInfo.get("path"), baseAnswer);
-		answer = clovaService.generateChatResponse(prompt, (String) personaPromptInfo.get("engine"));
+		String answer = clovaService.generateChatResponse(prompt, (String) personaPromptInfo.get("engine"));
 		personaDto.setAllAnswer(answer);
 
         System.out.println("answer --> " + answer);
@@ -141,7 +149,6 @@ public class PersonaService {
         personaDto.setStoreIdx(storeIdx);
         
         // 기존 persona가 있으면 수정
-        System.out.println("analyzeDto --> " + analyzeDto.getPersonaIdx());
         if(analyzeDto.getPersonaIdx() == 0) {
         	personaMapper.insertPersonaInfo(personaDto);
         } else {
