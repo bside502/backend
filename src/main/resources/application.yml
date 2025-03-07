@@ -7,7 +7,7 @@ spring:
     multipart:
       enabled: true
       max-file-size: 3MB
-      max-request-size: 3MB
+      max-request-size: 10MB
 
 server:
   port: 8080
@@ -23,10 +23,6 @@ clova:
   ocr:
     url: ENC(Kn5izFfJfu3ByYmEyeQcORLCZDw7PMwMRV3MeCfTfNktIo0s1hPB0cQdRH23rWfRHDHg/JtE8Sjza02l3sDrIYyVB+TvGeC7v/7A/zZs6OK4nDWdQZ/90tPwLP6Q9F2gNy9Be8G4zJsazkUtE7D3oSTq2OK8chtMbXbxUest4pi5nSu0YUDVyD246IKL9EiCwlJkMbtb7WPazuhPrIwdrA==)
     key: ENC(X2YCL9WSrof1H/Sn5pswlz4AOki3E5e2uS5hz7xayY+8KxrdGNOF872SklxKs1FvDxMNOKtftNf8qPm8tamL1gJWN9fjYdEo6zsK71WZRc4=)
-
-kakao:
-  client:
-    id: ENC(ujSaVQKE3+lHeKn2Emjco4Xz560+IW7W3x1EhiktYiDuKfSg/bqyPeIw4x7L+/FdMExvhFNbyYKKd5jJYVnDru33XBeQha+Z0VBfMN+fClg=)
 
 naver:
   client:
