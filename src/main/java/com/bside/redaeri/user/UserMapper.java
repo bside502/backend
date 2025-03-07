@@ -35,7 +35,7 @@ public interface UserMapper {
 	@Select("SELECT COUNT(*) FROM user WHERE idx = #{loginIdx}")
 	public int existsUser(int loginIdx);
 	
-	@Select("SELECT idx as userIdx FROM user WHERE user_id = #{id}")
+	@Select("SELECT idx as userIdx FROM user WHERE user_id = #{id} ORDER BY idx limit 1") // 임시
 	public Integer existUser(String id);
 	
 	public int deleteUser(Integer loginIdx);

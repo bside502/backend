@@ -11,6 +11,7 @@ import java.util.Map;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -39,7 +40,6 @@ public class LoginController {
 	private static String NAVER_TOKEN_URL = "https://nid.naver.com/oauth2.0/token";
 	
 	private static String NAVER_USER_INFO_URL = "https://openapi.naver.com/v1/nid/me";
-	private static String NAVER_CALLBACK_URL = "http://localhost:5671/login-callback";
 	
 	@Autowired
 	private UserMapper userMapper;
@@ -56,6 +56,7 @@ public class LoginController {
 		}
 		
 		Map<String, Object> userInfo = getUserProfile(accessToken);
+		System.out.println("reponse id --> " + userInfo.get("id"));
 		// {response : {id : xxxx}}
 		
 		Integer userIdx = userMapper.existUser((String) userInfo.get("id"));
@@ -63,8 +64,8 @@ public class LoginController {
 		if(userIdx == null) { //회원 x
 			UserDto userDto = new UserDto();
 			userDto.setUserId((String) userInfo.get("id"));
-			int idx = userMapper.insertUser(userDto);
-			if(idx == 1) {
+			int cnt = userMapper.insertUser(userDto);
+			if(cnt == 1) {
 				userInfo.put("loginIdx", userDto.getIdx());
 			} else {
 				return ApiResult.error(ResponseCode.FAIL_ADD_USER);
