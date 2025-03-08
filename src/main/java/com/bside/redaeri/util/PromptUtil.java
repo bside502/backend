@@ -8,7 +8,7 @@ public class PromptUtil {
 	/**
 	 * 페르소나 인물 프롬프트 정보 가져오기
 	 * @param persona ex) 알바생, 유쾌한,...바뀔 수 있음
-	 * @return path: 프롬프트 경로, type: 이미지 타입, engine: 엔진명
+	 * @return path: 프롬프트 경로, type: 이미지 타입, engine: 엔진명, personaName: 해피바이러스! ~~~
 	 */
 	public static Map<String, Object> personaPromtPath(String persona) {
 		Map<String, Object> result = new HashMap<>();
@@ -18,19 +18,19 @@ public class PromptUtil {
 		String personaName = "예의 바르고 나이스한 30대 초보 사장님";
 		int type = 2;
 		
-		if(persona.contains("알바생")) {
+		if(persona.equals("happyPersona")) {
 			promptPath += "generateAnswer1.json";
 			type = 1;
-			personaName = "해피바이러스! 발랄한 20대 알바생";;
-		} else if(persona.contains("유쾌한")) {
+			personaName = "해피바이러스! 발랄한 20대 알바생";
+		} else if(persona.equals("pleasantPersona")) {
 			promptPath += "generateAnswer3.json";
 			type = 3;
 			personaName = "단골 챙기는 정 많고 유쾌한 40대 사장님";
-		} else if(persona.contains("묵묵히")) {
+		} else if(persona.equals("silentPersona")) {
 			promptPath += "generateAnswer4.json";
 			type = 4;
 			personaName = "묵묵히 음식에 최선을 다하는 60대 사장님";
-		} else if(persona.contains("충청도")) {
+		} else if(persona.equals("chungcheongdoPersona")) {
 			promptPath += "generateAnswer5.json";
 			type = 5;
 			personaName = "충청도 출신 외식업 강자 사장님";
