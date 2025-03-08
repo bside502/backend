@@ -14,6 +14,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.bside.redaeri.clova.ClovaService;
 import com.bside.redaeri.persona.PersonaMapper;
+import com.bside.redaeri.store.StoreDto;
+import com.bside.redaeri.store.StoreMapper;
 import com.bside.redaeri.util.ApiResult;
 import com.bside.redaeri.util.PromptUtil;
 import com.bside.redaeri.vo.ResponseCode;
@@ -29,6 +31,9 @@ public class AnswerService {
 	
 	@Autowired
 	private PersonaMapper personaMapper;
+	
+	@Autowired
+	private StoreMapper storeMapper;
 	
 	/**
 	 * clova ocr 이미지 텍스트 읽기
@@ -90,14 +95,22 @@ public class AnswerService {
 		String prompt = clovaService.readPromptFileToJson("answerGenerate/reviewAnalyze.json", answerDto.getReviewText());
 		String answer = clovaService.generateChatResponse(prompt, "HCX-003");
 		answerDto.setReviewType(answer);
-		System.out.println("type --> " + answer);
 		
 		answerDto.setPersonaIdx((int) personaInfo.get("personaIdx"));
 		
 		// 1. 감정 + 길이에 맞게 리뷰 답변 생성
 		Map<String, Object> personaAdditionalPromptInfo = PromptUtil.emotionLengthPromptPath((String) personaInfo.get("emotionSelect"), (String) personaInfo.get("lengthSelect"));
 		
-		prompt = clovaService.readPromptFileToJson((String) personaAdditionalPromptInfo.get("path"), answerDto.getReviewText());
+		answerDto.setStoreName(answerMapper.getStoreName(answerDto));
+		//TODO 필수 문구 부분.. 생각 
+		String content = "- 가게 이름 : " + answerDto.getStoreName() + "\n";
+		if(answerDto.getIncludeText() != null && answerDto.getIncludeText().strip() != "") {
+			content += "- 포함 내용 : " + answerDto.getIncludeText() + "\n";
+		}
+		content += "- 리뷰 : " + answerDto.getReviewText();
+		System.out.println("content - > " + content);
+		
+		prompt = clovaService.readPromptFileToJson((String) personaAdditionalPromptInfo.get("path"), content);
 		String baseAnswer = clovaService.generateChatResponse(prompt, (String) personaAdditionalPromptInfo.get("engine"));
 		System.out.println("baseAnswer --> " + baseAnswer);
 		
@@ -105,12 +118,7 @@ public class AnswerService {
 		String persona = (String) personaInfo.get("personaSelect");
 		Map<String, Object> personaPromptInfo = PromptUtil.personaPromtPath(persona);
 		
-		//TODO 필수 문구 부분.. 생각
-		String content = "";
-		if(answerDto.getIncludeText() != null && answerDto.getIncludeText().strip() != "") {
-			content += "필수로 들어가야 하는 문구 : " + answerDto.getIncludeText() + "\n\n";
-		}
-		content += baseAnswer;
+		content = "text : " + baseAnswer;
 		
 		prompt = clovaService.readPromptFileToJson((String) personaPromptInfo.get("path"), content);
 		answer = clovaService.generateChatResponse(prompt, (String) personaPromptInfo.get("engine"));
@@ -136,7 +144,15 @@ public class AnswerService {
 		// 1. 감정 + 길이에 맞게 리뷰 답변 생성
 		Map<String, Object> personaAdditionalPromptInfo = PromptUtil.emotionLengthPromptPath((String) personaInfo.get("emotionSelect"), (String) personaInfo.get("lengthSelect"));
 		
-		String prompt = clovaService.readPromptFileToJson((String) personaAdditionalPromptInfo.get("path"), answerDto.getReviewText());
+		//TODO 필수 문구 부분.. 생각
+		String content = "- 가게 이름 : " + answerDto.getStoreName() + "\n";
+		if(answerDto.getIncludeText() != null && answerDto.getIncludeText().strip() != "") {
+			content += "- 포함 내용 : " + answerDto.getIncludeText() + "\n";
+		}
+		content += "- 리뷰 : " + answerDto.getReviewText();
+		System.out.println("content - > " + content);
+		
+		String prompt = clovaService.readPromptFileToJson((String) personaAdditionalPromptInfo.get("path"), content);
 		String baseAnswer = clovaService.generateChatResponse(prompt, (String) personaAdditionalPromptInfo.get("engine"));
 		System.out.println("baseAnswer --> " + baseAnswer);
 		
@@ -144,12 +160,8 @@ public class AnswerService {
 		String persona = (String) personaInfo.get("personaSelect");
 		Map<String, Object> personaPromptInfo = PromptUtil.personaPromtPath(persona);
 		
-		//TODO 필수 문구 부분.. 생각
-		String content = "";
-		if(answerDto.getIncludeText() != null && answerDto.getIncludeText().strip() != "") {
-			content += "필수로 들어가야 하는 문구 : " + answerDto.getIncludeText() + "\n\n";
-		}
-		content += baseAnswer;		
+		content = "text : " + baseAnswer;
+		
 		prompt = clovaService.readPromptFileToJson((String) personaPromptInfo.get("path"), content);
 		String answer = clovaService.generateChatResponse(prompt, (String) personaPromptInfo.get("engine"));
 		answerDto.setGenerateAnswer(answer);

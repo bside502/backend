@@ -25,6 +25,8 @@ public interface UserMapper {
 	@Select("SELECT " +
 	        "u.idx AS userIdx, " +
 	        "user_id AS userId, " +
+	        "s.idx AS storeIdx, " +
+	        "p.idx AS personaIdx, " +
 	        "store_name AS storeName, " +
 	        "store_type AS storeType, " +
 	        "persona_select AS personaSelect, " +

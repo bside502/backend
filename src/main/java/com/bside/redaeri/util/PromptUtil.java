@@ -20,7 +20,6 @@ public class PromptUtil {
 		
 		if(persona.contains("알바생")) {
 			promptPath += "generateAnswer1.json";
-			engine = "HCX-DASH-001";
 			type = 1;
 			personaName = "해피바이러스! 발랄한 20대 알바생";;
 		} else if(persona.contains("유쾌한")) {

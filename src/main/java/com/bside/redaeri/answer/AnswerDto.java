@@ -37,4 +37,6 @@ public class AnswerDto {
 
     @Schema(description = "생성일", example = "")
     private String insertDate;
+    
+    private String storeName;
 }

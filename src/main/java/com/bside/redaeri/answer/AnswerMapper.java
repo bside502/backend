@@ -33,14 +33,17 @@ public interface AnswerMapper {
 			+ "LIMIT 20")
 	public List<Map<String, Object>> getAnswerGenerateLogList(Integer loginIdx);
 	
-	@Select("SELECT idx as logIdx "
+	@Select("SELECT agl.idx as logIdx "
 			+ ", store_idx as storeIdx "
+			+ ", s.store_name as storeName "
 			+ ", include_text as includeText "
 			+ ", result as generateAnswer "
 			+ ", review_score as score "
 			+ ", content as reviewText "
-			+ "FROM answer_generate_log "
-			+ "WHERE idx = #{logIdx}")
+			+ "FROM answer_generate_log agl "
+			+ "JOIN store s "
+			+ "ON agl.store_idx = s.idx "
+			+ "WHERE agl.idx = #{logIdx}")
 	public AnswerDto getLogInfo(AnswerDto answerDto);
 	
 	@Update("UPDATE answer_generate_log "
@@ -49,4 +52,8 @@ public interface AnswerMapper {
 			+ "WHERE "
 			+ "idx = #{logIdx}")
 	public int updateAnswerGenerateLog(AnswerDto answerDto);
+
+	
+	@Select("SELECT store_name as storeName FROM store s WHERE user_idx = #{loginIdx}")
+	public String getStoreName(AnswerDto answerDto);
 }
