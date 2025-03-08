@@ -43,7 +43,6 @@ public class PersonaService {
 		int textLength = 0;
 		
 		StringBuilder sb = new StringBuilder();
-		sb.append("답변 : \n");
 		
 		PersonaDto personaDto = new PersonaDto();
 		if(analyzeDto.getPersonaIdx() == 0) {

@@ -91,11 +91,24 @@ public class AnswerService {
 		answerDto.setStoreIdx(storeIdx);
 		Map<String, Object> personaInfo = personaMapper.getPersonaInfo(storeIdx);
 		
-		// 리뷰 분류
-		String prompt = clovaService.readPromptFileToJson("answerGenerate/reviewAnalyze.json", answerDto.getReviewText());
-		String answer = clovaService.generateChatResponse(prompt, "HCX-003");
-		answerDto.setReviewType(answer);
-		
+		// 리뷰 분류 3점 이상부터 분류 적용
+		String reviewType = "부정";
+		String prompt = "";
+		if(answerDto.getScore() >= 3) {
+			prompt = clovaService.readPromptFileToJson("answerGenerate/reviewAnalyze.json", answerDto.getReviewText());
+			reviewType = clovaService.generateChatResponse(prompt, "HCX-003");
+			
+			if(reviewType.contains("긍정")) {
+				reviewType="긍정";
+			} else if(reviewType.contains("부정")) {
+				reviewType="부정";
+			} else if(reviewType.contains("문의")) {
+				reviewType="문의";
+			} else {
+				reviewType="중립";
+			}
+		}
+		answerDto.setReviewType(reviewType);
 		answerDto.setPersonaIdx((int) personaInfo.get("personaIdx"));
 		
 		// 1. 감정 + 길이에 맞게 리뷰 답변 생성
@@ -112,6 +125,7 @@ public class AnswerService {
 		
 		prompt = clovaService.readPromptFileToJson((String) personaAdditionalPromptInfo.get("path"), content);
 		String baseAnswer = clovaService.generateChatResponse(prompt, (String) personaAdditionalPromptInfo.get("engine"));
+		answerDto.setBaseAnswer(baseAnswer);
 		System.out.println("baseAnswer --> " + baseAnswer);
 		
 		// 2. 페르소나에 맞게 리뷰 답변 생성
@@ -121,7 +135,7 @@ public class AnswerService {
 		content = "text : " + baseAnswer;
 		
 		prompt = clovaService.readPromptFileToJson((String) personaPromptInfo.get("path"), content);
-		answer = clovaService.generateChatResponse(prompt, (String) personaPromptInfo.get("engine"));
+		String answer = clovaService.generateChatResponse(prompt, (String) personaPromptInfo.get("engine"));
 		answerDto.setGenerateAnswer(answer);
 		
 		int result = answerMapper.insertAnswerGenerateLog(answerDto);
@@ -154,6 +168,7 @@ public class AnswerService {
 		
 		String prompt = clovaService.readPromptFileToJson((String) personaAdditionalPromptInfo.get("path"), content);
 		String baseAnswer = clovaService.generateChatResponse(prompt, (String) personaAdditionalPromptInfo.get("engine"));
+		answerDto.setBaseAnswer(baseAnswer);
 		System.out.println("baseAnswer --> " + baseAnswer);
 		
 		// 2. 페르소나에 맞게 리뷰 답변 생성
