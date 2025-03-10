@@ -99,13 +99,13 @@ public class AnswerService {
 			reviewType = clovaService.generateChatResponse(prompt, "HCX-003");
 			
 			if(reviewType.contains("긍정")) {
-				reviewType="긍정";
+				reviewType="true";
 			} else if(reviewType.contains("부정")) {
-				reviewType="부정";
+				reviewType="false";
 			} else if(reviewType.contains("문의")) {
-				reviewType="문의";
+				reviewType="ask";
 			} else {
-				reviewType="중립";
+				reviewType="neutral";
 			}
 		}
 		answerDto.setReviewType(reviewType);

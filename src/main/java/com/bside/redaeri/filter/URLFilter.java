@@ -2,7 +2,6 @@ package com.bside.redaeri.filter;
 
 import java.io.IOException;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -20,9 +19,6 @@ import lombok.extern.slf4j.Slf4j;
 public class URLFilter extends OncePerRequestFilter {
 	@Value("${jwt.secret.key}")
 	private String SECRET_KEY;
-	
-	@Autowired
-	private JWTService jwtService;
 	
 	private final static String[] EXCLUDE_URI = {
 						"/api/v1/*"

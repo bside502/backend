@@ -7,7 +7,7 @@ public class PromptUtil {
 	
 	/**
 	 * 페르소나 인물 프롬프트 정보 가져오기
-	 * @param persona ex) 알바생, 유쾌한,...바뀔 수 있음
+	 * @param persona ex) happyPErsoan, nicePersona, ...
 	 * @return path: 프롬프트 경로, type: 이미지 타입, engine: 엔진명, personaName: 해피바이러스! ~~~
 	 */
 	public static Map<String, Object> personaPromtPath(String persona) {
@@ -58,26 +58,26 @@ public class PromptUtil {
 		String path = "persona/additional/";
 		String engine = "HCX-003";
 		
-		if(emotion.contains("감사")) {
-			if(length.contains("장문")) {
+		if(emotion.equals("thank")) {
+			if(length.equals("long")) {
 				path += "thankLong.json";
-			} else if(length.contains("중간")) {
+			} else if(length.equals("medium")) {
 				path += "thankMedium.json";
 			} else { // 단문
 				path += "thankShort.json";
 			}
-		} else if(emotion.contains("기뻐")) {
-			if(length.contains("장문")) {
+		} else if(emotion.equals("happy")) {
+			if(length.equals("long")) {
 				path += "happyLong.json";
-			} else if(length.contains("중간")) {
+			} else if(length.equals("medium")) {
 				path += "happyMedium.json";
 			} else { // 단문
 				path += "happyShort.json";
 			}
 		} else { // 격려
-			if(length.contains("장문")) {
+			if(length.equals("long")) {
 				path += "cheerLong.json";
-			} else if(length.contains("중간")) {
+			} else if(length.equals("medium")) {
 				path += "cheerMedium.json";
 			} else { // 단문
 				path += "cheerShort.json";
