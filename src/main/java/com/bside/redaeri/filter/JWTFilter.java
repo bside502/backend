@@ -2,6 +2,8 @@ package com.bside.redaeri.filter;
 
 import java.io.IOException;
 
+import javax.security.sasl.AuthenticationException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.annotation.Order;
@@ -12,9 +14,11 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
 @Order(2)
+@Slf4j
 public class JWTFilter extends OncePerRequestFilter {
 	@Value("${jwt.secret.key}")
 	private String SECRET_KEY;
@@ -34,19 +38,28 @@ public class JWTFilter extends OncePerRequestFilter {
 			return;
 		}
 		
-		filterChain.doFilter(request, response);
 		// TODO jwtFilter
 		
 		String token = request.getHeader("token");
+		System.out.println("token!! --> " + token);
+		/*
 		if(token == null || token == "") {
-			// auth error 떨구기
-			//response.sendRedirect("/");
-			return;
+		    sendUnauthorizedResponse(response, "missing JWT token");
+		    return;
 		}
-		
 		if(jwtService.isExpired(token)) {
-			// 토큰 시간 만료 error 떨구기
-			
+		    sendUnauthorizedResponse(response, "JWT token has expired");
+		    return;
 		}
+		*/
+		filterChain.doFilter(request, response);
+	}
+	
+	private void sendUnauthorizedResponse(HttpServletResponse response, String message) throws IOException {
+	    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+	    response.setContentType("application/json");
+	    response.getWriter().write(" {\"code\": 401,\n");
+	    response.getWriter().write("\"error\": \"" + message + "\"}");
+	    response.getWriter().flush();
 	}
 }

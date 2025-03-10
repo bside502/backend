@@ -50,4 +50,7 @@ public interface PersonaMapper {
 			+ "JOIN store s ON p.store_idx = s.idx "
 			+ "WHERE s.user_idx = #{loginIdx} ")
 	public int existPersona(Integer loginIdx);
+	
+	//TODO 선호 페르소나
+	public String preferPersona();
 }

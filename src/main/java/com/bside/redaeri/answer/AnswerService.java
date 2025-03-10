@@ -92,20 +92,20 @@ public class AnswerService {
 		Map<String, Object> personaInfo = personaMapper.getPersonaInfo(storeIdx);
 		
 		// 리뷰 분류 3점 이상부터 분류 적용
-		String reviewType = "부정";
+		String reviewType = "false";
 		String prompt = "";
 		if(answerDto.getScore() >= 3) {
 			prompt = clovaService.readPromptFileToJson("answerGenerate/reviewAnalyze.json", answerDto.getReviewText());
 			reviewType = clovaService.generateChatResponse(prompt, "HCX-003");
 			
 			if(reviewType.contains("긍정")) {
-				reviewType="긍정";
+				reviewType="true";
 			} else if(reviewType.contains("부정")) {
-				reviewType="부정";
+				reviewType="false";
 			} else if(reviewType.contains("문의")) {
-				reviewType="문의";
+				reviewType="ask";
 			} else {
-				reviewType="중립";
+				reviewType="neutral";
 			}
 		}
 		answerDto.setReviewType(reviewType);
