@@ -25,6 +25,9 @@ public class AnswerDto {
     
     @Schema(description = "꼭 넣고싶은 내용", example = "감사합니다!!")
     private String includeText;
+    
+    @Schema(description = "말투 적용안한 생성 답변", example = "")
+    private String baseAnswer;
 
     @Schema(description = "생성된 답변", example = "이 제품 정말 마음에 들어요!")
     private String generateAnswer;
@@ -37,4 +40,6 @@ public class AnswerDto {
 
     @Schema(description = "생성일", example = "")
     private String insertDate;
+    
+    private String storeName;
 }
