@@ -92,7 +92,7 @@ public class AnswerService {
 		Map<String, Object> personaInfo = personaMapper.getPersonaInfo(storeIdx);
 		
 		// 리뷰 분류 3점 이상부터 분류 적용
-		String reviewType = "부정";
+		String reviewType = "false";
 		String prompt = "";
 		if(answerDto.getScore() >= 3) {
 			prompt = clovaService.readPromptFileToJson("answerGenerate/reviewAnalyze.json", answerDto.getReviewText());
