@@ -326,4 +326,11 @@ public class PersonaService {
 			return ApiResult.error(ResponseCode.NOT_EXIST_PERSONA);
 		}
 	}
+	
+	public ApiResult<Object> preferPersona() {
+		
+		String persona = personaMapper.preferPersona();
+		
+		return ApiResult.success(null, null);
+	}
 }

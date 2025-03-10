@@ -41,13 +41,17 @@ public class JWTFilter extends OncePerRequestFilter {
 		// TODO jwtFilter
 		
 		String token = request.getHeader("token");
-		//System.out.println("token --> " + jwtService.isExpired(token));
+		System.out.println("token!! --> " + token);
+		/*
 		if(token == null || token == "") {
 		    sendUnauthorizedResponse(response, "missing JWT token");
+		    return;
 		}
 		if(jwtService.isExpired(token)) {
 		    sendUnauthorizedResponse(response, "JWT token has expired");
+		    return;
 		}
+		*/
 		filterChain.doFilter(request, response);
 	}
 	

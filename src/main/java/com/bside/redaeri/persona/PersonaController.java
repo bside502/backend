@@ -104,4 +104,10 @@ public class PersonaController {
 		return personaService.getPersonaInfo(loginIdx);
 	}
 	
+	@GetMapping("/persona/prefer")
+	public ApiResult<Object> personaPrefer() {
+		
+		return personaService.preferPersona();
+	}
+	
 }
