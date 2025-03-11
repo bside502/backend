@@ -137,7 +137,7 @@ public class PersonaService {
 		/**
 		 * 말투 분석 후 baseAnswer 가져오기
 		 */
-		Map<String, Object> personaAdditionalPromptInfo = PromptUtil.emotionLengthPromptPath(personaDto.getEmotionSelect(), personaDto.getLengthSelect());
+		Map<String, Object> personaAdditionalPromptInfo = PromptUtil.emotionLengthPromptPath(emotionText, lengthText);
         content = "###모든 리뷰에 답변할 수 있는 만능 답변을 생성하세요.\n- {가게 이름}은 제외하세요.\n- {포함 내용}은 제외하세요.";
         
 		prompt = clovaService.readPromptFileToJson((String) personaAdditionalPromptInfo.get("path"), content);
@@ -145,7 +145,7 @@ public class PersonaService {
 		
 		System.out.println("baseAnswer --> " + baseAnswer);
 		// 페르소나 인물 프롬프트 정보 가져오기
-		Map<String, Object> personaPromptInfo = PromptUtil.personaPromtPath(persona);
+		Map<String, Object> personaPromptInfo = PromptUtil.personaPromtPath(personaText);
 		
 		personaDto.setPersonaImgType((int) personaPromptInfo.get("type"));
 		
