@@ -95,8 +95,12 @@ public class PersonaService {
 		}
 		
 		String engine = "HCX-003";
-		String prompt = clovaService.readPromptFileToJson("personaAnalyze/personaSelect.json", sb.toString());
-		String persona = clovaService.generateChatResponse(prompt, engine);
+		
+		String content = "- 최대 3개의 답변이 주어질 수 있으며, 가장 유사한 단 하나의 인물만 출력하세요.\n" + sb.toString(); 
+		String prompt = clovaService.readPromptFileToJson("personaAnalyze/personaSelect.json", content);
+		String persona = clovaService.generateChatResponse(prompt, engine, "");
+		System.out.println("persona --> " + persona);
+		
 		String personaText = "nicePersona";
 		if(persona.contains("20대")) {
 			personaText = "happyPersona";
@@ -118,10 +122,9 @@ public class PersonaService {
 			lengthText = "medium";
 		}
 		personaDto.setLengthSelect(lengthText);
-		System.out.println("sb -> "+ sb.toString());
 		
 		prompt = clovaService.readPromptFileToJson("personaAnalyze/emotionSelect.json", sb.toString());
-		String emotion = clovaService.generateChatResponse(prompt, engine);
+		String emotion = clovaService.generateChatResponse(prompt, engine, "");
 		String emotionText = "cheer";
 		if(emotion.contains("감사")) {
 			emotionText = "thank";
@@ -134,16 +137,15 @@ public class PersonaService {
 		/**
 		 * 말투 분석 후 baseAnswer 가져오기
 		 */
-		Map<String, Object> personaAdditionalPromptInfo = PromptUtil.emotionLengthPromptPath(personaDto.getEmotionSelect(), personaDto.getLengthSelect());
-        String content = "###모든 리뷰에 답변할 수 있는 만능 답변을 생성하세요.\n- {가게 이름}은 제외하세요.\n- {포함 내용}은 제외하세요.";
+		Map<String, Object> personaAdditionalPromptInfo = PromptUtil.emotionLengthPromptPath(emotionText, lengthText);
+        content = "###모든 리뷰에 답변할 수 있는 만능 답변을 생성하세요.\n- {가게 이름}은 제외하세요.\n- {포함 내용}은 제외하세요.";
         
 		prompt = clovaService.readPromptFileToJson((String) personaAdditionalPromptInfo.get("path"), content);
-		String baseAnswer = clovaService.generateChatResponse(prompt, (String) personaAdditionalPromptInfo.get("engine"));
-		System.out.println(prompt);
+		String baseAnswer = clovaService.generateChatResponse(prompt, (String) personaAdditionalPromptInfo.get("engine"), "");
 		
 		System.out.println("baseAnswer --> " + baseAnswer);
 		// 페르소나 인물 프롬프트 정보 가져오기
-		Map<String, Object> personaPromptInfo = PromptUtil.personaPromtPath(persona);
+		Map<String, Object> personaPromptInfo = PromptUtil.personaPromtPath(personaText);
 		
 		personaDto.setPersonaImgType((int) personaPromptInfo.get("type"));
 		
@@ -151,7 +153,7 @@ public class PersonaService {
 		
 		// baseAnswer --> 1차로 생성한 답변에서 추가로 프롬프트 더 작성해야하는지 테스트
         prompt = clovaService.readPromptFileToJson((String) personaPromptInfo.get("path"), baseAnswer);
-		String answer = clovaService.generateChatResponse(prompt, (String) personaPromptInfo.get("engine"));
+		String answer = clovaService.generateChatResponse(prompt, (String) personaPromptInfo.get("engine"), personaText);
 		personaDto.setAllAnswer(answer);
 
         System.out.println("answer --> " + answer);
@@ -199,7 +201,7 @@ public class PersonaService {
         String content = "###모든 리뷰에 답변할 수 있는 만능 답변을 생성하세요.\n- {가게 이름}은 제외하세요.\n- {포함 내용}은 제외하세요.";
 		
 		String prompt = clovaService.readPromptFileToJson((String) personaAdditionalPromptInfo.get("path"), content);
-		String baseAnswer = clovaService.generateChatResponse(prompt, (String) personaAdditionalPromptInfo.get("engine"));
+		String baseAnswer = clovaService.generateChatResponse(prompt, (String) personaAdditionalPromptInfo.get("engine"), "");
 		System.out.println("baseAnswer -- >" + baseAnswer + "\npath  -->" +  personaAdditionalPromptInfo.get("path"));
 
 		String persona = personaDto.getPersonaSelect();
@@ -212,7 +214,7 @@ public class PersonaService {
 		
 		// baseAnswer --> 1차로 생성한 답변에서 추가로 프롬프트 더 작성해야하는지 테스트
         prompt = clovaService.readPromptFileToJson((String) personaPromptInfo.get("path"), baseAnswer);
-		String answer = clovaService.generateChatResponse(prompt, (String) personaPromptInfo.get("engine"));
+		String answer = clovaService.generateChatResponse(prompt, (String) personaPromptInfo.get("engine"), persona);
 		personaDto.setAllAnswer(answer);
 		
 		int storeIdx = personaMapper.getStoreIdx(loginIdx);
@@ -251,7 +253,7 @@ public class PersonaService {
 		
         // 1. 감정 + 길이에 맞게 만능 답변 생성
 		String prompt = clovaService.readPromptFileToJson((String) personaAdditionalPromptInfo.get("path"), content);
-		String baseAnswer = clovaService.generateChatResponse(prompt, (String) personaAdditionalPromptInfo.get("engine"));
+		String baseAnswer = clovaService.generateChatResponse(prompt, (String) personaAdditionalPromptInfo.get("engine"), "");
 		System.out.println("baseAnswer -- >" + baseAnswer + "\npath  -->" +  personaAdditionalPromptInfo.get("path"));
 
 		String persona = personaDto.getPersonaSelect();
@@ -264,7 +266,7 @@ public class PersonaService {
 		
 		// baseAnswer --> 1차로 생성한 답변에서 추가로 프롬프트 더 작성해야하는지 테스트
         prompt = clovaService.readPromptFileToJson((String) personaPromptInfo.get("path"), baseAnswer);
-		String answer = clovaService.generateChatResponse(prompt, (String) personaPromptInfo.get("engine"));
+		String answer = clovaService.generateChatResponse(prompt, (String) personaPromptInfo.get("engine"), persona);
 		personaDto.setAllAnswer(answer);
 		
 		int storeIdx = personaMapper.getStoreIdx(loginIdx);
@@ -328,9 +330,8 @@ public class PersonaService {
 	}
 	
 	public ApiResult<Object> preferPersona() {
+		Map<String, Object> persona = personaMapper.preferPersona();
 		
-		String persona = personaMapper.preferPersona();
-		
-		return ApiResult.success(null, null);
+		return ApiResult.success(ResponseCode.OK, persona);
 	}
 }

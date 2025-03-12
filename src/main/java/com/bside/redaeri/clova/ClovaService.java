@@ -80,9 +80,19 @@ public class ClovaService {
 	 * @param type
 	 * @return 
 	 */
-	public String generateChatResponse(String prompt, String engine) {
+	public String generateChatResponse(String prompt, String engine, String tuning) {
 		
-        String urlString = "https://clovastudio.stream.ntruss.com/testapp/v1/chat-completions/" + engine;
+        String urlString = "https://clovastudio.stream.ntruss.com";
+        
+        if(tuning.equals("analyze")) {
+        	urlString += "/testapp/v2/tasks/fv4a42an/chat-completions";
+        } else if(tuning.equals("pleasantPersona")) {
+        	urlString += "/testapp/v2/tasks/1gpvowmx/chat-completions";
+        } else {
+        	urlString += "/testapp/v1/chat-completions/" + engine;
+        }
+        System.out.println("urlString --> " + urlString);
+        
         String uuid = UUID.randomUUID().toString();  // 랜덤 UUID 생성
        
     	StringBuilder sb = new StringBuilder();

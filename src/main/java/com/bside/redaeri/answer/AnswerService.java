@@ -93,10 +93,12 @@ public class AnswerService {
 		
 		// 리뷰 분류 3점 이상부터 분류 적용
 		String reviewType = "false";
+		String content = "리뷰 : " + answerDto.getReviewText();
 		String prompt = "";
 		if(answerDto.getScore() >= 3) {
-			prompt = clovaService.readPromptFileToJson("answerGenerate/reviewAnalyze.json", answerDto.getReviewText());
-			reviewType = clovaService.generateChatResponse(prompt, "HCX-003");
+			prompt = clovaService.readPromptFileToJson("answerGenerate/reviewAnalyze.json", content);
+			reviewType = clovaService.generateChatResponse(prompt, "HCX-003", "");
+			System.out.println(reviewType);
 			
 			if(reviewType.contains("긍정")) {
 				reviewType="true";
@@ -115,16 +117,23 @@ public class AnswerService {
 		Map<String, Object> personaAdditionalPromptInfo = PromptUtil.emotionLengthPromptPath((String) personaInfo.get("emotionSelect"), (String) personaInfo.get("lengthSelect"));
 		
 		answerDto.setStoreName(answerMapper.getStoreName(answerDto));
-		//TODO 필수 문구 부분.. 생각 
-		String content = "- 가게 이름 : " + answerDto.getStoreName() + "\n";
+		//TODO 필수 문구 부분.. 생각
+		content = "###리뷰의 의미를 파악할 수 없는 경우, 에러라고 출력하세요.\n";
+		content += "가게 이름 : " + answerDto.getStoreName() + "\n";
 		if(answerDto.getIncludeText() != null && answerDto.getIncludeText().strip() != "") {
-			content += "- 포함 내용 : " + answerDto.getIncludeText() + "\n";
+			content += "포함 내용 : " + answerDto.getIncludeText() + "\n";
 		}
-		content += "- 리뷰 : " + answerDto.getReviewText();
-		System.out.println("content - > " + content);
-		
+		content += "리뷰 : " + answerDto.getReviewText();
+		if(answerDto.getScore() <= 2) {
+			content += "\n- 별점이 낮습니다. 부정적인 리뷰임을 고려하세요.";
+		}
+		System.out.println(content);
 		prompt = clovaService.readPromptFileToJson((String) personaAdditionalPromptInfo.get("path"), content);
-		String baseAnswer = clovaService.generateChatResponse(prompt, (String) personaAdditionalPromptInfo.get("engine"));
+		String baseAnswer = clovaService.generateChatResponse(prompt, (String) personaAdditionalPromptInfo.get("engine"), "");
+		if(baseAnswer.contains("에러")) {
+			baseAnswer = PromptUtil.getBaseAnswer(answerDto.getStoreName());
+		}
+		
 		answerDto.setBaseAnswer(baseAnswer);
 		System.out.println("baseAnswer --> " + baseAnswer);
 		
@@ -135,7 +144,7 @@ public class AnswerService {
 		content = "text : " + baseAnswer;
 		
 		prompt = clovaService.readPromptFileToJson((String) personaPromptInfo.get("path"), content);
-		String answer = clovaService.generateChatResponse(prompt, (String) personaPromptInfo.get("engine"));
+		String answer = clovaService.generateChatResponse(prompt, (String) personaPromptInfo.get("engine"), persona);
 		answerDto.setGenerateAnswer(answer);
 		
 		int result = answerMapper.insertAnswerGenerateLog(answerDto);
@@ -159,17 +168,25 @@ public class AnswerService {
 		Map<String, Object> personaAdditionalPromptInfo = PromptUtil.emotionLengthPromptPath((String) personaInfo.get("emotionSelect"), (String) personaInfo.get("lengthSelect"));
 		
 		//TODO 필수 문구 부분.. 생각
-		String content = "- 가게 이름 : " + answerDto.getStoreName() + "\n";
+		String content = "###리뷰의 의미를 파악할 수 없는 경우, 에러라고 출력하세요.\n";
+		content += "가게 이름 : " + answerDto.getStoreName() + "\n";
 		if(answerDto.getIncludeText() != null && answerDto.getIncludeText().strip() != "") {
-			content += "- 포함 내용 : " + answerDto.getIncludeText() + "\n";
+			content += "포함 내용 : " + answerDto.getIncludeText() + "\n";
 		}
-		content += "- 리뷰 : " + answerDto.getReviewText();
-		System.out.println("content - > " + content);
+		content += "리뷰 : " + answerDto.getReviewText();
+		if(answerDto.getScore() <= 2) {
+			content += "\n- 별점이 낮습니다. 부정적인 리뷰임을 고려하세요.";
+		}
+		System.out.println(content);
 		
 		String prompt = clovaService.readPromptFileToJson((String) personaAdditionalPromptInfo.get("path"), content);
-		String baseAnswer = clovaService.generateChatResponse(prompt, (String) personaAdditionalPromptInfo.get("engine"));
-		answerDto.setBaseAnswer(baseAnswer);
+		String baseAnswer = clovaService.generateChatResponse(prompt, (String) personaAdditionalPromptInfo.get("engine"), "");
 		System.out.println("baseAnswer --> " + baseAnswer);
+		if(baseAnswer.contains("에러")) {
+			baseAnswer = PromptUtil.getBaseAnswer(answerDto.getStoreName());
+		}
+		
+		answerDto.setBaseAnswer(baseAnswer);
 		
 		// 2. 페르소나에 맞게 리뷰 답변 생성
 		String persona = (String) personaInfo.get("personaSelect");
@@ -178,7 +195,7 @@ public class AnswerService {
 		content = "text : " + baseAnswer;
 		
 		prompt = clovaService.readPromptFileToJson((String) personaPromptInfo.get("path"), content);
-		String answer = clovaService.generateChatResponse(prompt, (String) personaPromptInfo.get("engine"));
+		String answer = clovaService.generateChatResponse(prompt, (String) personaPromptInfo.get("engine"), persona);
 		answerDto.setGenerateAnswer(answer);
 		
 		int cnt = answerMapper.updateAnswerGenerateLog(answerDto);

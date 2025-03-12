@@ -52,5 +52,7 @@ public interface PersonaMapper {
 	public int existPersona(Integer loginIdx);
 	
 	//TODO 선호 페르소나
-	public String preferPersona();
+	@Select("SELECT persona_select as preferPersona, count(*) as count "
+			+ "FROM persona GROUP BY persona_select order by count desc LIMIT 1")
+	public Map<String, Object> preferPersona();
 }
