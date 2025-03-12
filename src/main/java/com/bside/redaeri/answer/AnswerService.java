@@ -96,7 +96,7 @@ public class AnswerService {
 		String prompt = "";
 		if(answerDto.getScore() >= 3) {
 			prompt = clovaService.readPromptFileToJson("answerGenerate/reviewAnalyze.json", answerDto.getReviewText());
-			reviewType = clovaService.generateChatResponse(prompt, "HCX-003");
+			reviewType = clovaService.generateChatResponse(prompt, "HCX-003", "");
 			
 			if(reviewType.contains("긍정")) {
 				reviewType="true";
@@ -124,7 +124,7 @@ public class AnswerService {
 		System.out.println("content - > " + content);
 		
 		prompt = clovaService.readPromptFileToJson((String) personaAdditionalPromptInfo.get("path"), content);
-		String baseAnswer = clovaService.generateChatResponse(prompt, (String) personaAdditionalPromptInfo.get("engine"));
+		String baseAnswer = clovaService.generateChatResponse(prompt, (String) personaAdditionalPromptInfo.get("engine"), "");
 		answerDto.setBaseAnswer(baseAnswer);
 		System.out.println("baseAnswer --> " + baseAnswer);
 		
@@ -135,7 +135,7 @@ public class AnswerService {
 		content = "text : " + baseAnswer;
 		
 		prompt = clovaService.readPromptFileToJson((String) personaPromptInfo.get("path"), content);
-		String answer = clovaService.generateChatResponse(prompt, (String) personaPromptInfo.get("engine"));
+		String answer = clovaService.generateChatResponse(prompt, (String) personaPromptInfo.get("engine"), persona);
 		answerDto.setGenerateAnswer(answer);
 		
 		int result = answerMapper.insertAnswerGenerateLog(answerDto);
@@ -167,7 +167,7 @@ public class AnswerService {
 		System.out.println("content - > " + content);
 		
 		String prompt = clovaService.readPromptFileToJson((String) personaAdditionalPromptInfo.get("path"), content);
-		String baseAnswer = clovaService.generateChatResponse(prompt, (String) personaAdditionalPromptInfo.get("engine"));
+		String baseAnswer = clovaService.generateChatResponse(prompt, (String) personaAdditionalPromptInfo.get("engine"), "");
 		answerDto.setBaseAnswer(baseAnswer);
 		System.out.println("baseAnswer --> " + baseAnswer);
 		
@@ -178,7 +178,7 @@ public class AnswerService {
 		content = "text : " + baseAnswer;
 		
 		prompt = clovaService.readPromptFileToJson((String) personaPromptInfo.get("path"), content);
-		String answer = clovaService.generateChatResponse(prompt, (String) personaPromptInfo.get("engine"));
+		String answer = clovaService.generateChatResponse(prompt, (String) personaPromptInfo.get("engine"), persona);
 		answerDto.setGenerateAnswer(answer);
 		
 		int cnt = answerMapper.updateAnswerGenerateLog(answerDto);
