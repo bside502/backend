@@ -330,9 +330,8 @@ public class PersonaService {
 	}
 	
 	public ApiResult<Object> preferPersona() {
+		Map<String, Object> persona = personaMapper.preferPersona();
 		
-		String persona = personaMapper.preferPersona();
-		
-		return ApiResult.success(null, null);
+		return ApiResult.success(ResponseCode.OK, persona);
 	}
 }

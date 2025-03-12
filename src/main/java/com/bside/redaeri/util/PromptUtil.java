@@ -88,4 +88,12 @@ public class PromptUtil {
 		result.put("engine", engine);
 		return result;
 	}
+	
+	public static String getBaseAnswer(String storeName) {
+		String baseAnswer = "안녕하세요. " + storeName + "입니다.\n"
+				+ "주문해주셔서 진심으로 감사드립니다.\n"
+				+ "더 나은 맛과 양을 제공 드리기 위해 항상 노력 중이오니 앞으로도 많은 이용 부탁드리겠습니다!";
+		
+		return baseAnswer;
+	}
 }
