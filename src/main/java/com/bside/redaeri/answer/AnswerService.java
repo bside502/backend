@@ -124,7 +124,10 @@ public class AnswerService {
 			content += "포함 내용 : " + answerDto.getIncludeText() + "\n";
 		}
 		content += "리뷰 : " + answerDto.getReviewText();
-		
+		if(answerDto.getScore() <= 2) {
+			content += "\n- 별점이 낮습니다. 부정적인 리뷰임을 고려하세요.";
+		}
+		System.out.println(content);
 		prompt = clovaService.readPromptFileToJson((String) personaAdditionalPromptInfo.get("path"), content);
 		String baseAnswer = clovaService.generateChatResponse(prompt, (String) personaAdditionalPromptInfo.get("engine"), "");
 		if(baseAnswer.contains("에러")) {
@@ -170,7 +173,11 @@ public class AnswerService {
 		if(answerDto.getIncludeText() != null && answerDto.getIncludeText().strip() != "") {
 			content += "포함 내용 : " + answerDto.getIncludeText() + "\n";
 		}
-		content += "- 리뷰 : " + answerDto.getReviewText();
+		content += "리뷰 : " + answerDto.getReviewText();
+		if(answerDto.getScore() <= 2) {
+			content += "\n- 별점이 낮습니다. 부정적인 리뷰임을 고려하세요.";
+		}
+		System.out.println(content);
 		
 		String prompt = clovaService.readPromptFileToJson((String) personaAdditionalPromptInfo.get("path"), content);
 		String baseAnswer = clovaService.generateChatResponse(prompt, (String) personaAdditionalPromptInfo.get("engine"), "");

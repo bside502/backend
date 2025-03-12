@@ -42,6 +42,7 @@ public interface AnswerMapper {
 			+ ", generate_answer as generateAnswer "
 			+ ", review_score as score "
 			+ ", review_text as reviewText "
+			+ ", review_type as reviewType "
 			+ "FROM answer_generate_log agl "
 			+ "JOIN store s "
 			+ "ON agl.store_idx = s.idx "
