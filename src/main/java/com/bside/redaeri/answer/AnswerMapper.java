@@ -59,4 +59,11 @@ public interface AnswerMapper {
 	
 	@Select("SELECT store_name as storeName FROM store s WHERE user_idx = #{loginIdx}")
 	public String getStoreName(AnswerDto answerDto);
+	
+	@Select("SELECT include_text as includeText FROM user u WHERE idx = #{loginIdx}")
+	public Map<String, Object> getIncludeText(Integer loginIdx);
+	
+	@Update("UPDATE user SET include_text = #{includeText} WHERE idx = #{loginIdx}")
+	public int updateIncludeText(AnswerDto answerDto);
+	
 }

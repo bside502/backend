@@ -334,4 +334,10 @@ public class PersonaService {
 		
 		return ApiResult.success(ResponseCode.OK, persona);
 	}
+	
+	public ApiResult<Object> preferEmotion() {
+		Map<String, Object> emotion = personaMapper.preferEmotion();
+		
+		return ApiResult.success(ResponseCode.OK, emotion);
+	}
 }

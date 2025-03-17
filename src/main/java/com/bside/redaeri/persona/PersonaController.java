@@ -110,4 +110,11 @@ public class PersonaController {
 		return personaService.preferPersona();
 	}
 	
+	@GetMapping("/emotion/prefer")
+	public ApiResult<Object> emotionPrefer() {
+		
+		return personaService.preferEmotion();
+	}
+	
+	
 }

@@ -79,4 +79,10 @@ public class AnswerController {
 	}
 	
 	
+	@GetMapping("/include/get")
+	public ApiResult<Object> includeGet(@LoginIdx Integer loginIdx) {
+		
+		return answerService.getIncludeText(loginIdx);
+	}
+	
 }

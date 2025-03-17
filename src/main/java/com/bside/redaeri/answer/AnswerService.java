@@ -122,6 +122,8 @@ public class AnswerService {
 		content += "가게 이름 : " + answerDto.getStoreName() + "\n";
 		if(answerDto.getIncludeText() != null && answerDto.getIncludeText().strip() != "") {
 			content += "포함 내용 : " + answerDto.getIncludeText() + "\n";
+			// 포함내용 업데이트
+			answerMapper.updateIncludeText(answerDto);
 		}
 		content += "리뷰 : " + answerDto.getReviewText();
 		if(answerDto.getScore() <= 2) {
@@ -215,4 +217,11 @@ public class AnswerService {
 		return ApiResult.success(ResponseCode.OK, result);
 	}
 
+	
+	public ApiResult<Object> getIncludeText(Integer loginIdx) {
+		
+		Map<String, Object> text = answerMapper.getIncludeText(loginIdx);
+		
+		return ApiResult.success(ResponseCode.OK, text);
+	}
 }
