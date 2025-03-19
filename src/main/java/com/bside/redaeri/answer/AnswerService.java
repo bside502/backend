@@ -98,7 +98,6 @@ public class AnswerService {
 		if(answerDto.getScore() >= 3) {
 			prompt = clovaService.readPromptFileToJson("answerGenerate/reviewAnalyze.json", content);
 			reviewType = clovaService.generateChatResponse(prompt, "HCX-003", "");
-			System.out.println(reviewType);
 			
 			if(reviewType.contains("긍정")) {
 				reviewType="true";
@@ -129,7 +128,6 @@ public class AnswerService {
 		if(answerDto.getScore() <= 2) {
 			content += "\n- 별점이 낮습니다. 부정적인 리뷰임을 고려하세요.";
 		}
-		System.out.println(content);
 		prompt = clovaService.readPromptFileToJson((String) personaAdditionalPromptInfo.get("path"), content);
 		String baseAnswer = clovaService.generateChatResponse(prompt, (String) personaAdditionalPromptInfo.get("engine"), "");
 		if(baseAnswer.contains("에러")) {
@@ -137,7 +135,6 @@ public class AnswerService {
 		}
 		
 		answerDto.setBaseAnswer(baseAnswer);
-		System.out.println("baseAnswer --> " + baseAnswer);
 		
 		// 2. 페르소나에 맞게 리뷰 답변 생성
 		String persona = (String) personaInfo.get("personaSelect");
@@ -179,11 +176,9 @@ public class AnswerService {
 		if(answerDto.getScore() <= 2) {
 			content += "\n- 별점이 낮습니다. 부정적인 리뷰임을 고려하세요.";
 		}
-		System.out.println(content);
 		
 		String prompt = clovaService.readPromptFileToJson((String) personaAdditionalPromptInfo.get("path"), content);
 		String baseAnswer = clovaService.generateChatResponse(prompt, (String) personaAdditionalPromptInfo.get("engine"), "");
-		System.out.println("baseAnswer --> " + baseAnswer);
 		if(baseAnswer.contains("에러")) {
 			baseAnswer = PromptUtil.getBaseAnswer(answerDto.getStoreName());
 		}

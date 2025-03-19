@@ -88,6 +88,8 @@ public class ClovaService {
         	urlString += "/testapp/v2/tasks/fv4a42an/chat-completions";
         } else if(tuning.equals("pleasantPersona")) {
         	urlString += "/testapp/v2/tasks/1gpvowmx/chat-completions";
+        } else if(tuning.equals("happyPersona")) {
+        	urlString += "/testapp/v2/tasks/a3rblhs2/chat-completions";
         } else {
         	urlString += "/testapp/v1/chat-completions/" + engine;
         }

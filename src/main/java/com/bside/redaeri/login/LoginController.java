@@ -64,12 +64,10 @@ public class LoginController {
         ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, null, String.class);
         // 응답 본문을 JSON 문자열로 가져옴
         String responseBody = response.getBody();
-        System.out.println(responseBody);
         
         // ObjectMapper를 사용하여 JSON 문자열을 Map으로 변환
         ObjectMapper objectMapper = new ObjectMapper();
         Map<String, Object> resultMap = objectMapper.readValue(responseBody, Map.class);
-        System.out.println(resultMap.get("result"));
         
         if(resultMap.get("result").equals("success")) {
         	// db 데이터 삭제 진행
@@ -99,9 +97,7 @@ public class LoginController {
     	
 	@PostMapping("/naver/callback") //@RequestParam("code") String code, @RequestParam("state") String state
 	public ApiResult<Object> naverCallback(@RequestBody LoginDto loginDto) throws Exception {
-		System.out.println("code--> " + loginDto.getCode() + " : state --> " + loginDto.getState());
 		String accessToken = getAccessToken(loginDto.getCode(), loginDto.getState());
-		System.out.println("accessToken --> " + accessToken);
 		
 		UserDto userDto = new UserDto();
 		userDto.setAccessToken(accessToken);
@@ -111,7 +107,6 @@ public class LoginController {
 		}
 		
 		Map<String, Object> userInfo = getUserProfile(accessToken);
-		System.out.println("reponse id --> " + userInfo.get("id"));
 		userDto.setUserId((String) userInfo.get("id"));
 		// {response : {id : xxxx}}
 		
@@ -163,7 +158,6 @@ public class LoginController {
 				response.append(inputLine);
 			}
 			br.close();
-			System.out.println("result ==> " + response.toString());
 			// JSON 파싱하여 access_token만 추출
             JSONObject jsonResponse = new JSONObject(response.toString());
 
